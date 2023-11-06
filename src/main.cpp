@@ -16,8 +16,7 @@ pros::Motor motor_launch(1, pros::E_MOTOR_GEARSET_36, true, pros::E_MOTOR_ENCODE
 pros::Motor motor_intake(2, pros::E_MOTOR_GEARSET_06, true, pros::E_MOTOR_ENCODER_DEGREES);
 
 // PISTONS
-// pros::ADIDigitalOut piston_left_wing(1);
-// pros::ADIDigitalOut piston_right_wing(1);
+pros::ADIDigitalOut piston_flaps(1);
 
 void update_input();
 void tank_dirve(int leftInput, int rightInput);
@@ -25,8 +24,7 @@ void tank_drive_left_side(int input);
 void tank_drive_right_side(int input);
 void intake(int speed);
 void launcher(int speed);
-void operator_control();
-// void piston_wings();
+void flaps();
 
 // ======================================= //
 
@@ -41,8 +39,8 @@ void operator_control();
 	int buttonIntakeOut;
 	int buttonIntakeOff;
 
-	// int buttonPistonOut;
-	// int buttonPistonIn;
+	int buttonPistonOut;
+	int buttonPistonIn;
 
 /**
  * A callback function for LLEMU's center button.
@@ -129,6 +127,7 @@ void opcontrol() {
 		tank_dirve(analogLeftY, analogRightY);
 		launcher(launcherSpeed);
 		intake(intakeSpeed);
+		flaps();
 	
 		pros::delay(20);
 	}
@@ -146,8 +145,8 @@ void update_inputs() {
 	buttonIntakeOut = controller.get_digital(DIGITAL_R2);
 	buttonIntakeOff = controller.get_digital(DIGITAL_L1);
 
-	// buttonPistonOut = controller.get_digital(DIGITAL_UP);
-	// buttonPistonIn = controller.get_digital(DIGITAL_DOWN);
+	buttonPistonOut = controller.get_digital(DIGITAL_UP);
+	buttonPistonIn = controller.get_digital(DIGITAL_DOWN);
 }
 
 void tank_drive(int leftInput, int rightInput) {
@@ -195,15 +194,13 @@ void intake(int speed) {
 	}
 }
 
-// void piston_wings() {
-// 	if(buttonPistonOut) {
-// 		piston_left_wing.set_value(HIGH);
-// 		piston_right_wing.set_value(HIGH);
-// 		pros::delay(100);
-// 	}
-// 	if(buttonPistonIn) {
-// 		piston_left_wing.set_value(LOW);
-// 		piston_right_wing.set_value(LOW);
-// 		pros::delay(100);
-// 	}
-// }
+void flaps() {
+	if(buttonPistonOut) {
+		piston_flaps.set_value(HIGH);
+		pros::delay(100);
+	}
+	if(buttonPistonIn) {
+		piston_flaps.set_value(LOW);
+		pros::delay(100);
+	}
+}

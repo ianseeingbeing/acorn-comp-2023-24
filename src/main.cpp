@@ -1,72 +1,43 @@
 #include "main.h"
 
-// =========== INITIALIZATION ========== //
+const int LAUNCH_SPEED = 120;
+const int LAUNCH_LIFT_SPEED = 44;
+const int INTAKE_SPEED = 80;
+
+int buttonLauncher;
+int buttonLauncherUp;
+int buttonLauncherDown;
+
+int buttonIntakeIn;
+int buttonIntakeOut;
+int buttonIntakeOff;
+
+int buttonPistonOut;
+int buttonPistonIn;
+
+// controller
 pros::Controller controller(pros::E_CONTROLLER_MASTER);
 
-pros::Motor motor_left_A(17, pros::E_MOTOR_GEARSET_06, true, pros::E_MOTOR_ENCODER_DEGREES);
-pros::Motor motor_left_B(16, pros::E_MOTOR_GEARSET_06, true, pros::E_MOTOR_ENCODER_DEGREES);
-pros::Motor motor_left_C(15, pros::E_MOTOR_GEARSET_06, true, pros::E_MOTOR_ENCODER_DEGREES);
+// left drivetrain
+pros::Motor motor_left_a(10, pros::E_MOTOR_GEAR_BLUE, true, pros::E_MOTOR_ENCODER_DEGREES);
+pros::Motor motor_left_b(9, pros::E_MOTOR_GEAR_BLUE, true, pros::E_MOTOR_ENCODER_DEGREES);
+pros::Motor motor_left_c(8, pros::E_MOTOR_GEAR_BLUE, true, pros::E_MOTOR_ENCODER_DEGREES);
 
-pros::Motor motor_right_A(20, pros::E_MOTOR_GEARSET_06, true, pros::E_MOTOR_ENCODER_DEGREES);
-pros::Motor motor_right_B(19, pros::E_MOTOR_GEARSET_06, true, pros::E_MOTOR_ENCODER_DEGREES);
-pros::Motor motor_right_C(18, pros::E_MOTOR_GEARSET_06, true, pros::E_MOTOR_ENCODER_DEGREES);
+// right drivetrain
+pros::Motor motor_right_a(20, pros::E_MOTOR_GEAR_BLUE, true, pros::E_MOTOR_ENCODER_DEGREES);
+pros::Motor motor_right_b(19, pros::E_MOTOR_GEAR_BLUE, true, pros::E_MOTOR_ENCODER_DEGREES);
+pros::Motor motor_right_c(18, pros::E_MOTOR_GEAR_BLUE, true, pros::E_MOTOR_ENCODER_DEGREES);
 
-pros::Motor motor_launch(1, pros::E_MOTOR_GEARSET_36, true, pros::E_MOTOR_ENCODER_DEGREES);
+void tank_drive(int, int);
 
-pros::Motor motor_intake(2, pros::E_MOTOR_GEARSET_06, true, pros::E_MOTOR_ENCODER_DEGREES);
-
-// PISTONS
-pros::ADIDigitalOut piston_flaps(1);
-
-void update_input();
-void tank_dirve(int leftInput, int rightInput);
-void tank_drive_left_side(int input);
-void tank_drive_right_side(int input);
-void intake(int speed);
-void launcher(int speed);
-void flaps();
-
-// ======================================= //
-
-	int analogLeftY;
-	int analogRightY;
-	const int launcherSpeed = 120;
-	const int intakeSpeed = 80;
-
-	int buttonLauncher;
-
-	int buttonIntakeIn;
-	int buttonIntakeOut;
-	int buttonIntakeOff;
-
-	int buttonPistonOut;
-	int buttonPistonIn;
-
-/**
- * A callback function for LLEMU's center button.
- *
- * When this callback is fired, it will toggle line 2 of the LCD text between
- * "I was pressed!" and nothing.
- */
-void on_center_button() {
-	static bool pressed = false;
-	pressed = !pressed;
-	if (pressed) {
-		pros::lcd::set_text(2, "I was pressed!");
-	} else {
-		pros::lcd::clear_line(2);
-	}
-}
-
-/**
+/*
  * Runs initialization code. This occurs as soon as the program is started.
  *
  * All other competition modes are blocked by initialize; it is recommended
  * to keep execution time for this mode under a few seconds.
  */
 void initialize() {
-		
-	pros::delay(20);
+	
 }
 
 /**
@@ -123,84 +94,37 @@ void opcontrol() {
 
 	while (true) {
 
-		update_inputs();
-		tank_dirve(analogLeftY, analogRightY);
-		launcher(launcherSpeed);
-		intake(intakeSpeed);
-		flaps();
+		// update_inputs();
+		tank_drive(controller.get_analog(ANALOG_LEFT_Y), controller.get_analog(ANALOG_RIGHT_Y));
+		// launcher(LAUNCH_SPEED, 1);
+		// intake(INTAKE_SPEED, 1);
+		// flaps(1);
 	
 		pros::delay(20);
 	}
 }
 
 // Updates all the inputs for the processes
-void update_inputs() {
-	// ANALOG returns the speed not true or false.
-	analogLeftY = controller.get_analog(ANALOG_LEFT_Y);
-	analogRightY = controller.get_analog(ANALOG_RIGHT_Y);
-	
-	buttonLauncher = controller.get_digital(DIGITAL_A);
+// void update_inputs() {
+// 	buttonLauncher = controller.get_digital(DIGITAL_A);
+// 	buttonLauncherUp = controller.get_digital(DIGITAL_Y);
+// 	buttonLauncherDown = controller.get_digital(DIGITAL_B);
 
-	buttonIntakeIn = controller.get_digital(DIGITAL_R1);
-	buttonIntakeOut = controller.get_digital(DIGITAL_R2);
-	buttonIntakeOff = controller.get_digital(DIGITAL_L1);
+// 	buttonIntakeIn = controller.get_digital(DIGITAL_R1);
+// 	buttonIntakeOut = controller.get_digital(DIGITAL_R2);
+// 	buttonIntakeOff = controller.get_digital(DIGITAL_L1);
 
-	buttonPistonOut = controller.get_digital(DIGITAL_UP);
-	buttonPistonIn = controller.get_digital(DIGITAL_DOWN);
-}
+// 	buttonPistonOut = controller.get_digital(DIGITAL_UP);
+// 	buttonPistonIn = controller.get_digital(DIGITAL_DOWN);
+// }
 
 void tank_drive(int leftInput, int rightInput) {
-	tank_drive_left_side(leftInput);
-	tank_drive_right_side(rightInput);
-}
 
-void tank_drive_left_side(int input) {
-	motor_left_A = input;
-	motor_left_B = input;
-	motor_left_C = -input;
-}
+    motor_left_a = leftInput;
+    motor_left_b = leftInput;
+    motor_left_c = -leftInput;
 
-void tank_drive_right_side(int input) {
-	motor_right_A = -input;
-	motor_right_B = input;
-	motor_right_C = input;
-}
-
-// Launch Motor : type --> HOLD
-void launcher(int speed) {
-	if(buttonLauncher) {
-		motor_launch = launcherSpeed;
-		pros::delay(10);
-	}
-	else {
-		motor_launch = 0;
-		pros::delay(10);
-	}
-}
-
-// Intake Motor : type --> TOGGLE
-void intake(int speed) {
-	if(buttonIntakeIn) {
-		motor_intake = speed;
-		pros::delay(10);
-	}
-	if(buttonIntakeOut) {
-		motor_intake = -speed;
-		pros::delay(10);
-	}
-	if(buttonIntakeOff) {
-		motor_intake = 0;
-		pros::delay(10);
-	}
-}
-
-void flaps() {
-	if(buttonPistonOut) {
-		piston_flaps.set_value(HIGH);
-		pros::delay(100);
-	}
-	if(buttonPistonIn) {
-		piston_flaps.set_value(LOW);
-		pros::delay(100);
-	}
+	motor_right_a = -rightInput;
+	motor_right_b = rightInput;
+	motor_right_c = rightInput;
 }

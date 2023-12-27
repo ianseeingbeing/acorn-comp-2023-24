@@ -1,7 +1,7 @@
 #include "main.h"
 
 const int LAUNCH_SPEED = 120;
-const int LAUNCH_LIFT_SPEED = 44;
+const int LAUNCH_LIFT_SPEED = 80;
 const int INTAKE_SPEED = 80;
 
 int update_launcher_input();
@@ -166,25 +166,26 @@ void tank_drive(int leftInput, int rightInput) {
 
 // Launch Motor : type --> HOLD
 void launcher(int speed, int state) {
-	if (state) {
+	if (state == 1) {
 		motor_launch = speed;
-		pros::delay(10);
 	}
-	else {
+	if (state != 1) {
 		motor_launch = 0;
-		pros::delay(10);
 	}
+	pros::delay(10);
 }
 
-// Launcher Lift Motor : type --> TOGGLE
+// Launcher Lift Motor : type --> HOLD
 void launcher_lift(int speed, int state) {
-	if (state == 1) {
-		motor_launch_lift = speed;
-	}
-	if (state == 2) {
+	if (state == 1) { // up
 		motor_launch_lift = -speed;
 	}
-	motor_launch_lift = 0;
+	if (state == 2) { // down
+		motor_launch_lift = speed;
+	}
+	if (state < 1) {
+		motor_launch_lift = 0;
+	}
 	pros::delay(10);
 }
 
@@ -202,15 +203,16 @@ void intake(int speed, int state) {
 		motor_intake = 0;
 		pros::delay(10);
 	}
+	pros::delay(10);
 }
 
 // Flap Pistons : type --> TOGGLE
 void flaps(int state) {
-	if (state) {
+	if (state == 1) {
 		piston_flap_a.set_value(HIGH);
 		pros::delay(100);
 	}
-	if (state) {
+	if (state == 2) {
 		piston_flap_a.set_value(LOW);
 		pros::delay(100);
 	}

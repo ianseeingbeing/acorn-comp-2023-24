@@ -4,10 +4,20 @@ const int LAUNCH_SPEED = 120;
 const int LAUNCH_LIFT_SPEED = 80;
 const int INTAKE_SPEED = 80;
 
+enum Drivetrain {tank = 1, semiArcade = 2};
+
 int update_launcher_input();
 int update_launcher_lift_input();
 int update_intake_input();
 int update_flap_input();
+
+/*
+ *	TODO: lift motor --> HOLD mode.
+ *	TODO: add split-arcade drive mode insead of tank drive.
+ *	TODO: add ability to switch between different drive trains.
+ *	TODO: add autonomous.
+ *	TODO: 
+ */
 
 void tank_drive(int, int);
 void launcher(int, int);
@@ -33,7 +43,7 @@ pros::Motor motor_launch(5, pros::E_MOTOR_GEAR_BLUE, true, pros::E_MOTOR_ENCODER
 pros::Motor motor_launch_lift(6, pros::E_MOTOR_GEAR_GREEN, true, pros::E_MOTOR_ENCODER_DEGREES);
 
 // intake
-pros::Motor motor_intake(20, pros::E_MOTOR_GEAR_GREEN, true, pros::E_MOTOR_ENCODER_DEGREES);
+pros::Motor motor_intake(11, pros::E_MOTOR_GEAR_GREEN, true, pros::E_MOTOR_ENCODER_DEGREES);
 
 // pistons
 pros::ADIDigitalOut piston_flap_a(1);
@@ -50,7 +60,7 @@ void initialize() {
 	
 }
 
-/**
+/*
  * Runs while the robot is in the disabled state of Field Management System or
  * the VEX Competition Switch, following either autonomous or opcontrol. When
  * the robot is enabled, this task will exit.
@@ -59,7 +69,7 @@ void disabled() {
 	
 }
 
-/**
+/*
  * Runs after initialize(), and before autonomous when connected to the Field
  * Management System or the VEX Competition Switch. This is intended for
  * competition-specific initialization routines, such as an autonomous selector
@@ -72,7 +82,7 @@ void competition_initialize() {
 
 }
 
-/**
+/*
  * Runs the user autonomous code. This function will be started in its own task
  * with the default priority and stack size whenever the robot is enabled via
  * the Field Management System or the VEX Competition Switch in the autonomous
@@ -87,7 +97,7 @@ void autonomous() {
 
 }
 
-/**
+/*
  * Runs the operator control code. This function will be started in its own task
  * with the default priority and stack size whenever the robot is enabled via
  * the Field Management System or the VEX Competition Switch in the operator
@@ -102,9 +112,16 @@ void autonomous() {
  */
 void opcontrol() {
 
+	Drivetrain drivetrain = tank;
+
 	while (true) {
 
-		tank_drive(controller.get_analog(ANALOG_LEFT_Y), controller.get_analog(ANALOG_RIGHT_Y));	
+		if (drivetrain == tank)
+			tank_drive(controller.get_analog(ANALOG_LEFT_Y), controller.get_analog(ANALOG_RIGHT_Y));	
+
+		if (drivetrain == semiArcade)
+			semi_arcade_drive(controller.get_analog(ANALOG_LEFT_X), controller.get_analog(ANALOG_RIGHT_Y));
+		
 		launcher(LAUNCH_SPEED, update_launcher_input());
 		launcher_lift(LAUNCH_LIFT_SPEED, update_launcher_lift_input());
 		intake(INTAKE_SPEED, update_intake_input());
@@ -154,14 +171,27 @@ int update_flap_input() {
 }
 
 void tank_drive(int leftInput, int rightInput) {
+	left_motors(leftInput);
+	right_motors(rightInput);
+}
 
-    motor_left_a = leftInput;
-    motor_left_b = leftInput;
-    motor_left_c = -leftInput;
+void semi_arcade_drive(int xInput, int yInput) {
+	if (xInput > 0 && yInput > 0) {
+		xInput /= 2;
+		yInput /= 2;
+	}			
+}
 
-	motor_right_a = -rightInput;
-	motor_right_b = -rightInput;
-	motor_right_c = rightInput;
+void left_motors(int speed) {
+    motor_left_a = speed;
+    motor_left_b = speed;
+    motor_left_c = -speed;
+}
+
+void right_motors(int speed) {
+	motor_right_a = -speed;
+	motor_right_b = -speed;
+	motor_right_c = speed;
 }
 
 // Launch Motor : type --> HOLD

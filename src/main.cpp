@@ -4,7 +4,7 @@ const int LAUNCH_SPEED = 120;
 const int LAUNCH_LIFT_SPEED = 80;
 const int INTAKE_SPEED = 80;
 
-enum Drivetrain {tank = 1, semiArcade = 2};
+enum Drivetrain {tank = 1, splitArcade = 2};
 
 int update_launcher_input();
 int update_launcher_lift_input();
@@ -119,8 +119,8 @@ void opcontrol() {
 		if (drivetrain == tank)
 			tank_drive(controller.get_analog(ANALOG_LEFT_Y), controller.get_analog(ANALOG_RIGHT_Y));	
 
-		if (drivetrain == semiArcade)
-			semi_arcade_drive(controller.get_analog(ANALOG_LEFT_X), controller.get_analog(ANALOG_RIGHT_Y));
+		if (drivetrain == splitArcade)
+			split_arcade_drive(controller.get_analog(ANALOG_LEFT_X), controller.get_analog(ANALOG_RIGHT_Y));
 		
 		launcher(LAUNCH_SPEED, update_launcher_input());
 		launcher_lift(LAUNCH_LIFT_SPEED, update_launcher_lift_input());
@@ -129,6 +129,8 @@ void opcontrol() {
 	
 	}
 }
+
+// ===== INPUT UPDATES =====
 
 int update_launcher_input() {
 	if (controller.get_digital(DIGITAL_A)) {
@@ -170,16 +172,20 @@ int update_flap_input() {
 	return 0; // off
 }
 
+// ===== LOGISTICS =====
+
 void tank_drive(int leftInput, int rightInput) {
 	left_motors(leftInput);
 	right_motors(rightInput);
 }
 
-void semi_arcade_drive(int xInput, int yInput) {
-	if (xInput > 0 && yInput > 0) {
-		xInput /= 2;
-		yInput /= 2;
-	}			
+void split_arcade_drive(int xInput, int yInput) {
+	if (xInput == 0 && yInput != 0) {
+		tank_drive(yInput, yInput);
+	}
+	if (xInput != 0 && yInput == 0) {
+		tank_drive(xInput, -xInput);
+	}
 }
 
 void left_motors(int speed) {

@@ -2,7 +2,7 @@
 
 const int LAUNCH_SPEED = 120;
 const int LAUNCH_LIFT_SPEED = 80;
-const int INTAKE_SPEED = 80;
+const int INTAKE_SPEED = 100;
 
 enum Drivetrain {tank = 1, splitArcade = 2};
 
@@ -14,12 +14,13 @@ int update_flap_input();
 /*
  *	TODO: lift motor --> HOLD mode.
  *	TODO: add split-arcade drive mode insead of tank drive.
- *	TODO: add ability to switch between different drive trains.
  *	TODO: add autonomous.
- *	TODO: 
  */
 
 void tank_drive(int, int);
+void split_arcade_drive(int, int);
+void right_motors(int);
+void left_motors(int);
 void launcher(int, int);
 void launcher_lift(int, int);
 void intake(int, int);
@@ -29,21 +30,21 @@ void flaps(int);
 pros::Controller controller(pros::E_CONTROLLER_MASTER);
 
 // left drivetrain
-pros::Motor motor_left_a(10, pros::E_MOTOR_GEAR_BLUE, true, pros::E_MOTOR_ENCODER_DEGREES);
-pros::Motor motor_left_b(9, pros::E_MOTOR_GEAR_BLUE, true, pros::E_MOTOR_ENCODER_DEGREES);
-pros::Motor motor_left_c(8, pros::E_MOTOR_GEAR_BLUE, true, pros::E_MOTOR_ENCODER_DEGREES);
+pros::Motor motor_left_a(10, pros::E_MOTOR_GEAR_BLUE, false, pros::E_MOTOR_ENCODER_DEGREES);
+pros::Motor motor_left_b(9, pros::E_MOTOR_GEAR_BLUE, false, pros::E_MOTOR_ENCODER_DEGREES);
+pros::Motor motor_left_c(8, pros::E_MOTOR_GEAR_BLUE, false, pros::E_MOTOR_ENCODER_DEGREES);
 
 // right drivetrain
-pros::Motor motor_right_a(1, pros::E_MOTOR_GEAR_BLUE, true, pros::E_MOTOR_ENCODER_DEGREES);
-pros::Motor motor_right_b(2, pros::E_MOTOR_GEAR_BLUE, true, pros::E_MOTOR_ENCODER_DEGREES);
-pros::Motor motor_right_c(3, pros::E_MOTOR_GEAR_BLUE, true, pros::E_MOTOR_ENCODER_DEGREES);
+pros::Motor motor_right_a(1, pros::E_MOTOR_GEAR_BLUE, false, pros::E_MOTOR_ENCODER_DEGREES);
+pros::Motor motor_right_b(2, pros::E_MOTOR_GEAR_BLUE, false, pros::E_MOTOR_ENCODER_DEGREES);
+pros::Motor motor_right_c(3, pros::E_MOTOR_GEAR_BLUE, false, pros::E_MOTOR_ENCODER_DEGREES);
 
 // launcher
-pros::Motor motor_launch(5, pros::E_MOTOR_GEAR_BLUE, true, pros::E_MOTOR_ENCODER_DEGREES);
-pros::Motor motor_launch_lift(6, pros::E_MOTOR_GEAR_GREEN, true, pros::E_MOTOR_ENCODER_DEGREES);
+pros::Motor motor_launch(5, pros::E_MOTOR_GEAR_BLUE, false, pros::E_MOTOR_ENCODER_DEGREES);
+pros::Motor motor_launch_lift(6, pros::E_MOTOR_GEAR_GREEN, false, pros::E_MOTOR_ENCODER_DEGREES);
 
 // intake
-pros::Motor motor_intake(11, pros::E_MOTOR_GEAR_GREEN, true, pros::E_MOTOR_ENCODER_DEGREES);
+pros::Motor motor_intake(11, pros::E_MOTOR_GEAR_GREEN, false, pros::E_MOTOR_ENCODER_DEGREES);
 
 // pistons
 pros::ADIDigitalOut piston_flap_a(1);
@@ -132,6 +133,11 @@ void opcontrol() {
 
 // ===== INPUT UPDATES =====
 
+Drivetrain update_drivetrain_state(Drivetrain drivetrain) {
+
+	return drivetrain;
+}
+
 int update_launcher_input() {
 	if (controller.get_digital(DIGITAL_A)) {
 		return 1; // on
@@ -156,17 +162,17 @@ int update_intake_input() {
 	else if (controller.get_digital(DIGITAL_R2)) {
 		return 2; // eject
 	}
-	else if (controller.get_digital(DIGITAL_L1)) {
+	else if (controller.get_digital(DIGITAL_X)) {
 		return 0; // off
 	}
 	return -1; // error
 }
 
 int update_flap_input() {
-	if (controller.get_digital(DIGITAL_UP)) {
+	if (controller.get_digital(DIGITAL_L1)) {
 		return 1; // up
 	}
-	if (controller.get_digital(DIGITAL_DOWN)) {
+	if (controller.get_digital(DIGITAL_L2)) {
 		return 2; // down
 	}
 	return 0; // off
@@ -189,15 +195,15 @@ void split_arcade_drive(int xInput, int yInput) {
 }
 
 void left_motors(int speed) {
-    motor_left_a = speed;
-    motor_left_b = speed;
-    motor_left_c = -speed;
+    motor_left_a = -speed;
+    motor_left_b = -speed;
+    motor_left_c = speed;
 }
 
 void right_motors(int speed) {
-	motor_right_a = -speed;
-	motor_right_b = -speed;
-	motor_right_c = speed;
+	motor_right_a = speed;
+	motor_right_b = speed;
+	motor_right_c = -speed;
 }
 
 // Launch Motor : type --> HOLD
@@ -214,10 +220,10 @@ void launcher(int speed, int state) {
 // Launcher Lift Motor : type --> HOLD
 void launcher_lift(int speed, int state) {
 	if (state == 1) { // up
-		motor_launch_lift = -speed;
+		motor_launch_lift = speed;
 	}
 	if (state == 2) { // down
-		motor_launch_lift = speed;
+		motor_launch_lift = -speed;
 	}
 	if (state < 1) {
 		motor_launch_lift = 0;
@@ -228,11 +234,11 @@ void launcher_lift(int speed, int state) {
 // Intake Motor : type --> TOGGLE
 void intake(int speed, int state) {
 	if (state == 1) {
-		motor_intake = speed;
+		motor_intake = -speed;
 		pros::delay(10);
 	}
 	if (state == 2) {
-		motor_intake = -speed;
+		motor_intake = speed;
 		pros::delay(10);
 	}
 	if (state == 0) {

@@ -6,6 +6,7 @@ const int INTAKE_SPEED = 100;
 
 enum Drivetrain {tank = 1, splitArcade = 2};
 
+void update_drivetrian_state(Drivetrain);
 int update_launcher_input();
 int update_launcher_lift_input();
 int update_intake_input();
@@ -117,6 +118,8 @@ void opcontrol() {
 
 	while (true) {
 
+		update_drivetrain_state(drivetrain);
+
 		if (drivetrain == tank)
 			tank_drive(controller.get_analog(ANALOG_LEFT_Y), controller.get_analog(ANALOG_RIGHT_Y));	
 
@@ -133,9 +136,17 @@ void opcontrol() {
 
 // ===== INPUT UPDATES =====
 
-Drivetrain update_drivetrain_state(Drivetrain drivetrain) {
+void update_drivetrain_state(Drivetrain &drivetrain) {
 
-	return drivetrain;
+	if (controller.get_digital(DIGITAL_DOWN)) {
+		if (drivetrain == tank) {
+			drivetrain = splitArcade;
+		}
+		else {
+			drivetrain = tank;
+		}
+		pros::delay(100);	
+	}
 }
 
 int update_launcher_input() {

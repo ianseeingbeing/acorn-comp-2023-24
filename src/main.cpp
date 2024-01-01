@@ -114,6 +114,8 @@ void autonomous() {
  */
 void opcontrol() {
 
+	motor_launch_lift.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+
 	Drivetrain drivetrain = tank;
 
 	while (true) {
@@ -197,12 +199,17 @@ void tank_drive(int leftInput, int rightInput) {
 }
 
 void split_arcade_drive(int xInput, int yInput) {
-	if (xInput == 0 && yInput != 0) {
+	if (xInput == 0 && yInput != 0)
 		tank_drive(yInput, yInput);
-	}
-	if (xInput != 0 && yInput == 0) {
+
+	if (xInput != 0 && yInput == 0)
 		tank_drive(xInput, -xInput);
-	}
+
+	if (xInput > 0 && yInput != 0)
+		tank_drive(xInput, 0);
+
+	if (xInput < 0 && yInput != 0)
+		tank_drive(0, xInput);
 }
 
 void left_motors(int speed) {

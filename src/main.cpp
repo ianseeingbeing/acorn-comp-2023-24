@@ -31,14 +31,14 @@ void flaps(int);
 pros::Controller controller(pros::E_CONTROLLER_MASTER);
 
 // left drivetrain
-pros::Motor motor_left_a(10, pros::E_MOTOR_GEAR_BLUE, false, pros::E_MOTOR_ENCODER_DEGREES);
-pros::Motor motor_left_b(9, pros::E_MOTOR_GEAR_BLUE, false, pros::E_MOTOR_ENCODER_DEGREES);
+pros::Motor motor_left_a(10, pros::E_MOTOR_GEAR_BLUE, true, pros::E_MOTOR_ENCODER_DEGREES);
+pros::Motor motor_left_b(9, pros::E_MOTOR_GEAR_BLUE, true, pros::E_MOTOR_ENCODER_DEGREES);
 pros::Motor motor_left_c(8, pros::E_MOTOR_GEAR_BLUE, false, pros::E_MOTOR_ENCODER_DEGREES);
 
 // right drivetrain
 pros::Motor motor_right_a(1, pros::E_MOTOR_GEAR_BLUE, false, pros::E_MOTOR_ENCODER_DEGREES);
 pros::Motor motor_right_b(2, pros::E_MOTOR_GEAR_BLUE, false, pros::E_MOTOR_ENCODER_DEGREES);
-pros::Motor motor_right_c(3, pros::E_MOTOR_GEAR_BLUE, false, pros::E_MOTOR_ENCODER_DEGREES);
+pros::Motor motor_right_c(3, pros::E_MOTOR_GEAR_BLUE, true, pros::E_MOTOR_ENCODER_DEGREES);
 
 // launcher
 pros::Motor motor_launch(7, pros::E_MOTOR_GEAR_BLUE, false, pros::E_MOTOR_ENCODER_DEGREES);
@@ -213,15 +213,15 @@ void split_arcade_drive(int xInput, int yInput) {
 }
 
 void left_motors(int speed) {
-    motor_left_a = -speed;
-    motor_left_b = -speed;
+    motor_left_a = speed;
+    motor_left_b = speed;
     motor_left_c = speed;
 }
 
 void right_motors(int speed) {
 	motor_right_a = speed;
 	motor_right_b = speed;
-	motor_right_c = -speed;
+	motor_right_c = speed;
 }
 
 // Launch Motor : type --> HOLD

@@ -23,8 +23,7 @@ void launcher_lift(int, int);
 void intake(int, int);
 void flaps(int);
 
-// controller
-pros::Controller controller(pros::E_CONTROLLER_MASTER);
+// Controller called master
 
 // launcher
 pros::Motor motor_launch(7, pros::E_MOTOR_GEAR_BLUE, false, pros::E_MOTOR_ENCODER_DEGREES);
@@ -224,7 +223,7 @@ void opcontrol() {
 
 void update_drivetrain_state(Drivetrain &drivetrain) {
 
-	if (controller.get_digital(DIGITAL_DOWN)) {
+	if (master.get_digital(DIGITAL_DOWN)) {
 		if (drivetrain == tank) {
 			drivetrain = splitArcade;
 		}
@@ -236,40 +235,40 @@ void update_drivetrain_state(Drivetrain &drivetrain) {
 }
 
 int update_launcher_input() {
-	if (controller.get_digital(DIGITAL_A)) {
+	if (master.get_digital(DIGITAL_A)) {
 		return 1; // on
 	}
 	return 0; // off
 }
 
 int update_launcher_lift_input() {
-	if (controller.get_digital(DIGITAL_Y)) {
+	if (master.get_digital(DIGITAL_Y)) {
 		return 1; // up
 	}
-	if (controller.get_digital(DIGITAL_B)) {
+	if (master.get_digital(DIGITAL_B)) {
 		return 2; // down
 	}
 	return 0; // off
 }
 
 int update_intake_input() {
-	if (controller.get_digital(DIGITAL_R1)) {
+	if (master.get_digital(DIGITAL_R1)) {
 		return 1; // consume
 	} 
-	else if (controller.get_digital(DIGITAL_R2)) {
+	else if (master.get_digital(DIGITAL_R2)) {
 		return 2; // eject
 	}
-	else if (controller.get_digital(DIGITAL_X)) {
+	else if (master.get_digital(DIGITAL_X)) {
 		return 0; // off
 	}
 	return -1; // error
 }
 
 int update_flap_input() {
-	if (controller.get_digital(DIGITAL_L1)) {
+	if (master.get_digital(DIGITAL_L1)) {
 		return 1; // up
 	}
-	if (controller.get_digital(DIGITAL_L2)) {
+	if (master.get_digital(DIGITAL_L2)) {
 		return 2; // down
 	}
 	return 0; // off

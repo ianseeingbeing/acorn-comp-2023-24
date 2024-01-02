@@ -1,15 +1,51 @@
 #include "main.h"
 
+const int LAUNCH_SPEED = 120;
+const int LAUNCH_LIFT_SPEED = 80;
+const int INTAKE_SPEED = 100;
+
+enum Drivetrain {tank = 1, splitArcade = 2};
+
+void update_drivetrian_state(Drivetrain);
+int update_launcher_input();
+int update_launcher_lift_input();
+int update_intake_input();
+int update_flap_input();
+
+/*
+ *	TODO: lift motor --> HOLD mode.
+ *	TODO: add split-arcade drive mode insead of tank drive.
+ *	TODO: add autonomous.
+ */
+
+void launcher(int, int);
+void launcher_lift(int, int);
+void intake(int, int);
+void flaps(int);
+
+// controller
+pros::Controller controller(pros::E_CONTROLLER_MASTER);
+
+// launcher
+pros::Motor motor_launch(7, pros::E_MOTOR_GEAR_BLUE, false, pros::E_MOTOR_ENCODER_DEGREES);
+pros::Motor motor_launch_lift(6, pros::E_MOTOR_GEAR_GREEN, false, pros::E_MOTOR_ENCODER_DEGREES);
+
+// intake
+pros::Motor motor_intake(4, pros::E_MOTOR_GEAR_GREEN, false, pros::E_MOTOR_ENCODER_DEGREES);
+
+// pistons
+pros::ADIDigitalOut piston_flap_a(1);
+// pros::ADIDigitalOut piston_flap_b(1);
 
 // Chassis constructor
 Drive chassis (
   // Left Chassis Ports (negative port will reverse it!)
   //   the first port is the sensored port (when trackers are not used!)
-  {-15, -16}
+  {-10, -9, 8}
 
   // Right Chassis Ports (negative port will reverse it!)
   //   the first port is the sensored port (when trackers are not used!)
-  ,{6, 5}
+  ,{1, 2, -3}
 
   // IMU Port
   ,20
@@ -61,7 +97,7 @@ void initialize() {
 
   // Configure your chassis controls
   chassis.toggle_modify_curve_with_controller(true); // Enables modifying the controller curve with buttons on the joysticks
-  chassis.set_active_brake(0); // Sets the active brake kP. We recommend 0.1.
+  chassis.set_active_brake(0.1); // Sets the active brake kP. We recommend 0.1.
   chassis.set_curve_default(0, 0); // Defaults for curve. If using tank, only the first parameter is used. (Comment this line out if you have an SD card!)  
   default_constants(); // Set the drive to your own constants from autons.cpp!
 
@@ -152,9 +188,11 @@ void opcontrol() {
   // This is preference to what you like to drive on.
   chassis.set_drive_brake(MOTOR_BRAKE_COAST);
 
+  Drivetrain drivetrain = tank;
+
   while (true) {
 
-    chassis.tank(); // Tank control
+    // chassis.tank(); // Tank control
     // chassis.arcade_standard(ez::SPLIT); // Standard split arcade
     // chassis.arcade_standard(ez::SINGLE); // Standard single arcade
     // chassis.arcade_flipped(ez::SPLIT); // Flipped split arcade
@@ -164,6 +202,131 @@ void opcontrol() {
     // Put more user control code here!
     // . . .
 
+    motor_launch_lift.set_brake_mode(MOTOR_BRAKE_HOLD);
+    motor_intake.set_brake_mode(MOTOR_BRAKE_HOLD);
+
+    update_drivetrain_state(drivetrain);
+
+		if (drivetrain == tank)
+      chassis.tank();
+
+		if (drivetrain == splitArcade)
+      chassis.arcade_standard(ez::SPLIT);
+
+		launcher(LAUNCH_SPEED, update_launcher_input());
+		launcher_lift(LAUNCH_LIFT_SPEED, update_launcher_lift_input());
+		intake(INTAKE_SPEED, update_intake_input());
+		flaps(update_flap_input());
+
     pros::delay(ez::util::DELAY_TIME); // This is used for timer calculations!  Keep this ez::util::DELAY_TIME
   }
+}
+
+void update_drivetrain_state(Drivetrain &drivetrain) {
+
+	if (controller.get_digital(DIGITAL_DOWN)) {
+		if (drivetrain == tank) {
+			drivetrain = splitArcade;
+		}
+		else {
+			drivetrain = tank;
+		}
+		pros::delay(100);	
+	}
+}
+
+int update_launcher_input() {
+	if (controller.get_digital(DIGITAL_A)) {
+		return 1; // on
+	}
+	return 0; // off
+}
+
+int update_launcher_lift_input() {
+	if (controller.get_digital(DIGITAL_Y)) {
+		return 1; // up
+	}
+	if (controller.get_digital(DIGITAL_B)) {
+		return 2; // down
+	}
+	return 0; // off
+}
+
+int update_intake_input() {
+	if (controller.get_digital(DIGITAL_R1)) {
+		return 1; // consume
+	} 
+	else if (controller.get_digital(DIGITAL_R2)) {
+		return 2; // eject
+	}
+	else if (controller.get_digital(DIGITAL_X)) {
+		return 0; // off
+	}
+	return -1; // error
+}
+
+int update_flap_input() {
+	if (controller.get_digital(DIGITAL_L1)) {
+		return 1; // up
+	}
+	if (controller.get_digital(DIGITAL_L2)) {
+		return 2; // down
+	}
+	return 0; // off
+}
+
+// ===== LOGISTICS =====
+
+// Launch Motor : type --> HOLD
+void launcher(int speed, int state) {
+	if (state == 1) {
+		motor_launch = speed;
+	}
+	if (state != 1) {
+		motor_launch = 0;
+	}
+	pros::delay(10);
+}
+
+// Launcher Lift Motor : type --> HOLD
+void launcher_lift(int speed, int state) {
+	if (state == 1) { // up
+		motor_launch_lift = speed;
+	}
+	if (state == 2) { // down
+		motor_launch_lift = -speed;
+	}
+	if (state < 1) {
+		motor_launch_lift = 0;
+	}
+	pros::delay(10);
+}
+
+// Intake Motor : type --> TOGGLE
+void intake(int speed, int state) {
+	if (state == 1) {
+		motor_intake = -speed;
+		pros::delay(10);
+	}
+	if (state == 2) {
+		motor_intake = speed;
+		pros::delay(10);
+	}
+	if (state == 0) {
+		motor_intake = 0;
+		pros::delay(10);
+	}
+	pros::delay(10);
+}
+
+// Flap Pistons : type --> TOGGLE
+void flaps(int state) {
+	if (state == 1) {
+		piston_flap_a.set_value(HIGH);
+		pros::delay(100);
+	}
+	if (state == 2) {
+		piston_flap_a.set_value(LOW);
+		pros::delay(100);
+	}
 }

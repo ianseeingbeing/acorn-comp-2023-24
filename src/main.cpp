@@ -5,12 +5,13 @@ const int LAUNCH_LIFT_SPEED = 80;
 const int INTAKE_SPEED = 100;
 
 enum Drivetrain {tank = 1, splitArcade = 2};
+enum PistonState {up = 0, down = 1};
 
-void update_drivetrian_state(Drivetrain);
+void update_drivetrian_state(Drivetrain&);
+void update_flaps_state(PistonState&);
 int update_launcher_input();
 int update_launcher_lift_input();
 int update_intake_input();
-int update_flap_input();
 
 /*
  *	TODO: lift motor --> HOLD mode.
@@ -21,7 +22,6 @@ int update_flap_input();
 void launcher(int, int);
 void launcher_lift(int, int);
 void intake(int, int);
-void flaps(int);
 
 // Controller called master
 
@@ -33,7 +33,7 @@ pros::Motor motor_launch_lift(6, pros::E_MOTOR_GEAR_GREEN, false, pros::E_MOTOR_
 pros::Motor motor_intake(4, pros::E_MOTOR_GEAR_GREEN, false, pros::E_MOTOR_ENCODER_DEGREES);
 
 // pistons
-pros::ADIDigitalOut piston_flap_a(1);
+pros::ADIDigitalOut piston_flaps(1);
 // pros::ADIDigitalOut piston_flap_b(1);
 
 // Chassis constructor
@@ -188,49 +188,64 @@ void opcontrol() {
   chassis.set_drive_brake(MOTOR_BRAKE_COAST);
 
   Drivetrain drivetrain = tank;
+  PistonState pistonState = up; 
 
   while (true) {
 
+    // EZ_Template controls
     // chassis.tank(); // Tank control
     // chassis.arcade_standard(ez::SPLIT); // Standard split arcade
     // chassis.arcade_standard(ez::SINGLE); // Standard single arcade
     // chassis.arcade_flipped(ez::SPLIT); // Flipped split arcade
     // chassis.arcade_flipped(ez::SINGLE); // Flipped single arcade
 
-    // . . .
-    // Put more user control code here!
-    // . . .
-
     motor_launch_lift.set_brake_mode(MOTOR_BRAKE_HOLD);
     motor_intake.set_brake_mode(MOTOR_BRAKE_HOLD);
 
+    // updates enums 
     update_drivetrain_state(drivetrain);
+    update_flaps_state(pistonState);    
 
-		if (drivetrain == tank)
-      chassis.tank();
-
-		if (drivetrain == splitArcade)
-      chassis.arcade_standard(ez::SPLIT);
-
+    // controlls for other motors
 		launcher(LAUNCH_SPEED, update_launcher_input());
 		launcher_lift(LAUNCH_LIFT_SPEED, update_launcher_lift_input());
 		intake(INTAKE_SPEED, update_intake_input());
-		flaps(update_flap_input());
 
     pros::delay(ez::util::DELAY_TIME); // This is used for timer calculations!  Keep this ez::util::DELAY_TIME
   }
 }
 
 void update_drivetrain_state(Drivetrain &drivetrain) {
-
 	if (master.get_digital(DIGITAL_DOWN)) {
 		if (drivetrain == tank) {
 			drivetrain = splitArcade;
-		}
-		else {
+    }
+		if (drivetrain == splitArcade) {
 			drivetrain = tank;
-		}
+    }
 		pros::delay(100);	
+	}
+  
+  if (drivetrain == tank) {
+    chassis.tank();
+  }
+  if (drivetrain == splitArcade) {
+    chassis.arcade_standard(ez::SPLIT);
+  }
+
+}
+
+void update_flaps_state(PistonState &state) {
+	if (master.get_digital(DIGITAL_UP)) {
+    if (state == up) {
+      state = down;
+      piston_flaps.set_value(HIGH);
+    }
+    if (state == down) {
+      state = up;
+      piston_flaps.set_value(LOW);
+    }
+    pros::delay(100); 
 	}
 }
 
@@ -242,10 +257,10 @@ int update_launcher_input() {
 }
 
 int update_launcher_lift_input() {
-	if (master.get_digital(DIGITAL_Y)) {
+	if (master.get_digital(DIGITAL_L1)) {
 		return 1; // up
 	}
-	if (master.get_digital(DIGITAL_B)) {
+	if (master.get_digital(DIGITAL_L2)) {
 		return 2; // down
 	}
 	return 0; // off
@@ -262,16 +277,6 @@ int update_intake_input() {
 		return 0; // off
 	}
 	return -1; // error
-}
-
-int update_flap_input() {
-	if (master.get_digital(DIGITAL_L1)) {
-		return 1; // up
-	}
-	if (master.get_digital(DIGITAL_L2)) {
-		return 2; // down
-	}
-	return 0; // off
 }
 
 // ===== LOGISTICS =====
@@ -319,13 +324,11 @@ void intake(int speed, int state) {
 }
 
 // Flap Pistons : type --> TOGGLE
-void flaps(int state) {
-	if (state == 1) {
-		piston_flap_a.set_value(HIGH);
-		pros::delay(100);
-	}
-	if (state == 2) {
-		piston_flap_a.set_value(LOW);
-		pros::delay(100);
-	}
-}
+// void flaps(int state) {
+// 	if (state == 0) {
+// 		piston_flap_a.set_value(LOW); // flaps are up/in
+// 	}
+// 	if (state == 1) {
+// 		piston_flap_a.set_value(HIGH); // flaps are down/out
+// 	}
+// }

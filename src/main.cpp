@@ -41,11 +41,11 @@ pros::Motor motor_right_b(2, pros::E_MOTOR_GEAR_BLUE, false, pros::E_MOTOR_ENCOD
 pros::Motor motor_right_c(3, pros::E_MOTOR_GEAR_BLUE, false, pros::E_MOTOR_ENCODER_DEGREES);
 
 // launcher
-pros::Motor motor_launch(5, pros::E_MOTOR_GEAR_BLUE, false, pros::E_MOTOR_ENCODER_DEGREES);
+pros::Motor motor_launch(7, pros::E_MOTOR_GEAR_BLUE, false, pros::E_MOTOR_ENCODER_DEGREES);
 pros::Motor motor_launch_lift(6, pros::E_MOTOR_GEAR_GREEN, false, pros::E_MOTOR_ENCODER_DEGREES);
 
 // intake
-pros::Motor motor_intake(11, pros::E_MOTOR_GEAR_GREEN, false, pros::E_MOTOR_ENCODER_DEGREES);
+pros::Motor motor_intake(4, pros::E_MOTOR_GEAR_GREEN, false, pros::E_MOTOR_ENCODER_DEGREES);
 
 // pistons
 pros::ADIDigitalOut piston_flap_a(1);

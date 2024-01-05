@@ -7,7 +7,7 @@ const int INTAKE_SPEED = 100;
 enum Drivetrain {tank = 1, splitArcade = 2};
 enum PistonState {up = 0, down = 1};
 
-void update_drivetrian_state(Drivetrain&);
+void update_drivetrain_state(Drivetrain&);
 void update_flaps_state(PistonState&);
 int update_launcher_input();
 int update_launcher_lift_input();
@@ -188,7 +188,10 @@ void opcontrol() {
   chassis.set_drive_brake(MOTOR_BRAKE_COAST);
 
   Drivetrain drivetrain = tank;
-  PistonState pistonState = up; 
+  PistonState pistonState = up;
+
+  motor_launch_lift.set_brake_mode(MOTOR_BRAKE_HOLD);
+  motor_intake.set_brake_mode(MOTOR_BRAKE_HOLD);
 
   while (true) {
 
@@ -199,15 +202,13 @@ void opcontrol() {
     // chassis.arcade_flipped(ez::SPLIT); // Flipped split arcade
     // chassis.arcade_flipped(ez::SINGLE); // Flipped single arcade
 
-    motor_launch_lift.set_brake_mode(MOTOR_BRAKE_HOLD);
-    motor_intake.set_brake_mode(MOTOR_BRAKE_HOLD);
 
     // updates enums 
     update_drivetrain_state(drivetrain);
     update_flaps_state(pistonState);    
 
     // controlls for other motors
-		launcher(LAUNCH_SPEED, update_launcher_input());
+		launcher(-LAUNCH_SPEED, update_launcher_input());
 		launcher_lift(LAUNCH_LIFT_SPEED, update_launcher_lift_input());
 		intake(INTAKE_SPEED, update_intake_input());
 
@@ -215,33 +216,33 @@ void opcontrol() {
   }
 }
 
-void update_drivetrain_state(Drivetrain &drivetrain) {
+void update_drivetrain_state(Drivetrain &drive) {
 	if (master.get_digital(DIGITAL_DOWN)) {
-		if (drivetrain == tank) {
-			drivetrain = splitArcade;
+    pros::delay(500);
+		if (tank == drive) {
+      drive = splitArcade;
+    } 
+    else {
+      drive = tank;
     }
-		if (drivetrain == splitArcade) {
-			drivetrain = tank;
-    }
-		pros::delay(100);	
-	}
-  
-  if (drivetrain == tank) {
+		pros::delay(500);	
+  }
+  if (drive == tank) {
     chassis.tank();
   }
-  if (drivetrain == splitArcade) {
-    chassis.arcade_standard(ez::SPLIT);
+  if (drive == splitArcade) {
+    chassis.arcade_flipped(ez::SPLIT);
   }
-
 }
 
 void update_flaps_state(PistonState &state) {
 	if (master.get_digital(DIGITAL_UP)) {
+    pros::delay(400);
     if (state == up) {
       state = down;
       piston_flaps.set_value(HIGH);
     }
-    if (state == down) {
+    else {
       state = up;
       piston_flaps.set_value(LOW);
     }
@@ -322,13 +323,3 @@ void intake(int speed, int state) {
 	}
 	pros::delay(10);
 }
-
-// Flap Pistons : type --> TOGGLE
-// void flaps(int state) {
-// 	if (state == 0) {
-// 		piston_flap_a.set_value(LOW); // flaps are up/in
-// 	}
-// 	if (state == 1) {
-// 		piston_flap_a.set_value(HIGH); // flaps are down/out
-// 	}
-// }

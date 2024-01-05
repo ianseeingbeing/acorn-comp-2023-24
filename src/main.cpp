@@ -1,12 +1,12 @@
 #include "main.h"
 
-const int LAUNCH_SPEED = 120;
+const int LAUNCH_SPEED = 127;
 const int LAUNCH_LIFT_SPEED = 80;
 const int INTAKE_SPEED = 100;
 
 enum Drivetrain {tank = 1, splitArcade = 2};
 
-void update_drivetrian_state(Drivetrain);
+// void update_drivetrian_state(Drivetrain&);
 int update_launcher_input();
 int update_launcher_lift_input();
 int update_intake_input();
@@ -120,13 +120,13 @@ void opcontrol() {
 
 	while (true) {
 
-		update_drivetrain_state(drivetrain);
+		// update_drivetrain_state(drivetrain);
 
-		if (drivetrain == tank)
+		// if (drivetrain == tank)
 			tank_drive(controller.get_analog(ANALOG_LEFT_Y), controller.get_analog(ANALOG_RIGHT_Y));	
 
-		if (drivetrain == splitArcade)
-			split_arcade_drive(controller.get_analog(ANALOG_LEFT_X), controller.get_analog(ANALOG_RIGHT_Y));
+		// if (drivetrain == splitArcade)
+			// split_arcade_drive(controller.get_analog(ANALOG_LEFT_X), controller.get_analog(ANALOG_RIGHT_Y));
 		
 		launcher(LAUNCH_SPEED, update_launcher_input());
 		launcher_lift(LAUNCH_LIFT_SPEED, update_launcher_lift_input());

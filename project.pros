@@ -1,7 +1,7 @@
 {
   "py/object": "pros.conductor.project.Project",
   "py/state": {
-    "project_name": "acorn_comp_2023-24",
+    "project_name": "ttacorn_comp_2023-24",
     "target": "v5",
     "templates": {
       "kernel": {

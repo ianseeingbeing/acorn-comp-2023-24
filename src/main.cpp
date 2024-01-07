@@ -1,6 +1,6 @@
 #include "main.h"
 
-const int LAUNCH_SPEED = 127;
+const int LAUNCH_SPEED = -127;
 const int LAUNCH_LIFT_SPEED = 80;
 const int INTAKE_SPEED = 100;
 
@@ -46,22 +46,23 @@ Drive chassis (
   //   the first port is the sensored port (when trackers are not used!)
   ,{1, 2, -3}
 
-  // IMU Port
-  ,20
+  // IMU Port 
+  //    (port for the gyroscope sensor)
+  ,11
 
   // Wheel Diameter (Remember, 4" wheels are actually 4.125!)
   //    (or tracking wheel diameter)
-  ,2.5
+  ,3.25
 
   // Cartridge RPM
   //   (or tick per rotation if using tracking wheels)
-  ,1200
+  ,6000
 
   // External Gear Ratio (MUST BE DECIMAL)
   //    (or gear ratio of tracking wheel)
   // eg. if your drive is 84:36 where the 36t is powered, your RATIO would be 2.333.
   // eg. if your drive is 36:60 where the 60t is powered, your RATIO would be 0.6.
-  ,2
+  ,0.6
 
 
   // Uncomment if using tracking wheels
@@ -208,7 +209,7 @@ void opcontrol() {
     update_flaps_state(pistonState);    
 
     // controlls for other motors
-		launcher(-LAUNCH_SPEED, update_launcher_input());
+		launcher(LAUNCH_SPEED, update_launcher_input());
 		launcher_lift(LAUNCH_LIFT_SPEED, update_launcher_lift_input());
 		intake(INTAKE_SPEED, update_intake_input());
 

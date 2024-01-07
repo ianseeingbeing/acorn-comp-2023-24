@@ -5,12 +5,13 @@ const int LAUNCH_LIFT_SPEED = 80;
 const int INTAKE_SPEED = 100;
 
 enum Drivetrain {tank = 1, splitArcade = 2};
+enum PistonState {up = 0, down = 1};
 
-// void update_drivetrian_state(Drivetrain&);
+void update_drivetrain_state(Drivetrain&);
+void update_flaps_state(PistonState&);
 int update_launcher_input();
 int update_launcher_lift_input();
 int update_intake_input();
-int update_flap_input();
 
 /*
  *	TODO: lift motor --> HOLD mode.
@@ -18,27 +19,11 @@ int update_flap_input();
  *	TODO: add autonomous.
  */
 
-void tank_drive(int, int);
-void split_arcade_drive(int, int);
-void right_motors(int);
-void left_motors(int);
 void launcher(int, int);
 void launcher_lift(int, int);
 void intake(int, int);
-void flaps(int);
 
-// controller
-pros::Controller controller(pros::E_CONTROLLER_MASTER);
-
-// left drivetrain
-pros::Motor motor_left_a(10, pros::E_MOTOR_GEAR_BLUE, true, pros::E_MOTOR_ENCODER_DEGREES);
-pros::Motor motor_left_b(9, pros::E_MOTOR_GEAR_BLUE, true, pros::E_MOTOR_ENCODER_DEGREES);
-pros::Motor motor_left_c(8, pros::E_MOTOR_GEAR_BLUE, false, pros::E_MOTOR_ENCODER_DEGREES);
-
-// right drivetrain
-pros::Motor motor_right_a(1, pros::E_MOTOR_GEAR_BLUE, false, pros::E_MOTOR_ENCODER_DEGREES);
-pros::Motor motor_right_b(2, pros::E_MOTOR_GEAR_BLUE, false, pros::E_MOTOR_ENCODER_DEGREES);
-pros::Motor motor_right_c(3, pros::E_MOTOR_GEAR_BLUE, true, pros::E_MOTOR_ENCODER_DEGREES);
+// Controller called master
 
 // launcher
 pros::Motor motor_launch(7, pros::E_MOTOR_GEAR_BLUE, false, pros::E_MOTOR_ENCODER_DEGREES);
@@ -49,29 +34,106 @@ pros::Motor motor_intake(4, pros::E_MOTOR_GEAR_GREEN, false, pros::E_MOTOR_ENCOD
 
 // pistons
 pros::ADIDigitalOut piston_flap_a(1);
-// pros::ADIDigitalOut piston_flap_b(1);
+pros::ADIDigitalOut piston_flap_b(2);
+
+// Chassis constructor
+Drive chassis (
+  // Left Chassis Ports (negative port will reverse it!)
+  //   the first port is the sensored port (when trackers are not used!)
+  {-10, -9, 8}
+
+  // Right Chassis Ports (negative port will reverse it!)
+  //   the first port is the sensored port (when trackers are not used!)
+  ,{1, 2, -3}
+
+  // IMU Port
+  ,20
+
+  // Wheel Diameter (Remember, 4" wheels are actually 4.125!)
+  //    (or tracking wheel diameter)
+  ,2.5
+
+  // Cartridge RPM
+  //   (or tick per rotation if using tracking wheels)
+  ,1200
+
+  // External Gear Ratio (MUST BE DECIMAL)
+  //    (or gear ratio of tracking wheel)
+  // eg. if your drive is 84:36 where the 36t is powered, your RATIO would be 2.333.
+  // eg. if your drive is 36:60 where the 60t is powered, your RATIO would be 0.6.
+  ,2
 
 
-/*
+  // Uncomment if using tracking wheels
+  /*
+  // Left Tracking Wheel Ports (negative port will reverse it!)
+  // ,{1, 2} // 3 wire encoder
+  // ,8 // Rotation sensor
+
+  // Right Tracking Wheel Ports (negative port will reverse it!)
+  // ,{-3, -4} // 3 wire encoder
+  // ,-9 // Rotation sensor
+  */
+
+  // Uncomment if tracking wheels are plugged into a 3 wire expander
+  // 3 Wire Port Expander Smart Port
+  // ,1
+);
+
+
+
+/**
  * Runs initialization code. This occurs as soon as the program is started.
  *
  * All other competition modes are blocked by initialize; it is recommended
  * to keep execution time for this mode under a few seconds.
  */
 void initialize() {
-	
+  // Print our branding over your terminal :D
+  ez::print_ez_template();
+  
+  pros::delay(500); // Stop the user from doing anything while legacy ports configure.
+
+  // Configure your chassis controls
+  chassis.toggle_modify_curve_with_controller(true); // Enables modifying the controller curve with buttons on the joysticks
+  chassis.set_active_brake(0.1); // Sets the active brake kP. We recommend 0.1.
+  chassis.set_curve_default(0, 0); // Defaults for curve. If using tank, only the first parameter is used. (Comment this line out if you have an SD card!)  
+  default_constants(); // Set the drive to your own constants from autons.cpp!
+
+  // These are already defaulted to these buttons, but you can change the left/right curve buttons here!
+  // chassis.set_left_curve_buttons (pros::E_CONTROLLER_DIGITAL_LEFT, pros::E_CONTROLLER_DIGITAL_RIGHT); // If using tank, only the left side is used. 
+  // chassis.set_right_curve_buttons(pros::E_CONTROLLER_DIGITAL_Y,    pros::E_CONTROLLER_DIGITAL_A);
+
+  // Autonomous Selector using LLEMU
+  ez::as::auton_selector.add_autons({
+    Auton("Example Drive\n\nDrive forward and come back.", drive_example),
+    Auton("Example Turn\n\nTurn 3 times.", turn_example),
+    Auton("Drive and Turn\n\nDrive forward, turn, come back. ", drive_and_turn),
+    Auton("Drive and Turn\n\nSlow down during drive.", wait_until_change_speed),
+    Auton("Swing Example\n\nSwing, drive, swing.", swing_example),
+    Auton("Combine all 3 movements", combining_movements),
+    Auton("Interference\n\nAfter driving forward, robot performs differently if interfered or not.", interfered_example),
+  });
+
+  // Initialize chassis and auton selector
+  chassis.initialize();
+  ez::as::initialize();
 }
 
-/*
+
+
+/**
  * Runs while the robot is in the disabled state of Field Management System or
  * the VEX Competition Switch, following either autonomous or opcontrol. When
  * the robot is enabled, this task will exit.
  */
 void disabled() {
-	
+  // . . .
 }
 
-/*
+
+
+/**
  * Runs after initialize(), and before autonomous when connected to the Field
  * Management System or the VEX Competition Switch. This is intended for
  * competition-specific initialization routines, such as an autonomous selector
@@ -81,10 +143,12 @@ void disabled() {
  * starts.
  */
 void competition_initialize() {
-
+  // . . .
 }
 
-/*
+
+
+/**
  * Runs the user autonomous code. This function will be started in its own task
  * with the default priority and stack size whenever the robot is enabled via
  * the Field Management System or the VEX Competition Switch in the autonomous
@@ -96,10 +160,17 @@ void competition_initialize() {
  * from where it left off.
  */
 void autonomous() {
+  chassis.reset_pid_targets(); // Resets PID targets to 0
+  chassis.reset_gyro(); // Reset gyro position to 0
+  chassis.reset_drive_sensor(); // Reset drive sensors to 0
+  chassis.set_drive_brake(MOTOR_BRAKE_HOLD); // Set motors to hold.  This helps autonomous consistency.
 
+  ez::as::auton_selector.call_selected_auton(); // Calls selected auton from autonomous selector.
 }
 
-/*
+
+
+/**
  * Runs the operator control code. This function will be started in its own task
  * with the default priority and stack size whenever the robot is enabled via
  * the Field Management System or the VEX Competition Switch in the operator
@@ -113,116 +184,105 @@ void autonomous() {
  * task, not resume it from where it left off.
  */
 void opcontrol() {
+  // This is preference to what you like to drive on.
+  chassis.set_drive_brake(MOTOR_BRAKE_COAST);
 
-	motor_launch_lift.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+  Drivetrain drivetrain = tank;
+  PistonState pistonState = up;
 
-	Drivetrain drivetrain = tank;
+  motor_launch_lift.set_brake_mode(MOTOR_BRAKE_HOLD);
+  motor_intake.set_brake_mode(MOTOR_BRAKE_HOLD);
 
-	while (true) {
+  while (true) {
 
-		// update_drivetrain_state(drivetrain);
+    // EZ_Template controls
+    // chassis.tank(); // Tank control
+    // chassis.arcade_standard(ez::SPLIT); // Standard split arcade
+    // chassis.arcade_standard(ez::SINGLE); // Standard single arcade
+    // chassis.arcade_flipped(ez::SPLIT); // Flipped split arcade
+    // chassis.arcade_flipped(ez::SINGLE); // Flipped single arcade
 
-		// if (drivetrain == tank)
-			tank_drive(controller.get_analog(ANALOG_LEFT_Y), controller.get_analog(ANALOG_RIGHT_Y));	
 
-		// if (drivetrain == splitArcade)
-			// split_arcade_drive(controller.get_analog(ANALOG_LEFT_X), controller.get_analog(ANALOG_RIGHT_Y));
-		
-		launcher(LAUNCH_SPEED, update_launcher_input());
+    // updates enums 
+    update_drivetrain_state(drivetrain);
+    update_flaps_state(pistonState);    
+
+    // controlls for other motors
+		launcher(-LAUNCH_SPEED, update_launcher_input());
 		launcher_lift(LAUNCH_LIFT_SPEED, update_launcher_lift_input());
 		intake(INTAKE_SPEED, update_intake_input());
-		flaps(update_flap_input());
-	
-	}
+
+    pros::delay(ez::util::DELAY_TIME); // This is used for timer calculations!  Keep this ez::util::DELAY_TIME
+  }
 }
 
-// ===== INPUT UPDATES =====
+void update_drivetrain_state(Drivetrain &drive) {
+	if (master.get_digital(DIGITAL_DOWN)) {
+    pros::delay(500);
+		if (tank == drive) {
+      drive = splitArcade;
+    } 
+    else {
+      drive = tank;
+    }
+		pros::delay(500);	
+  }
+  if (drive == tank) {
+    chassis.tank();
+  }
+  if (drive == splitArcade) {
+    chassis.arcade_flipped(ez::SPLIT);
+  }
+}
 
-void update_drivetrain_state(Drivetrain &drivetrain) {
-
-	if (controller.get_digital(DIGITAL_DOWN)) {
-		if (drivetrain == tank) {
-			drivetrain = splitArcade;
-		}
-		else {
-			drivetrain = tank;
-		}
-		pros::delay(100);	
+void update_flaps_state(PistonState &state) {
+	if (master.get_digital(DIGITAL_UP)) {
+    pros::delay(400);
+    if (state == up) {
+      state = down;
+      piston_flap_a.set_value(HIGH);
+      piston_flap_b.set_value(HIGH);
+    }
+    else {
+      state = up;
+      piston_flap_a.set_value(LOW);
+      piston_flap_b.set_value(LOW);
+    }
+    pros::delay(100); 
 	}
 }
 
 int update_launcher_input() {
-	if (controller.get_digital(DIGITAL_A)) {
+	if (master.get_digital(DIGITAL_A)) {
 		return 1; // on
 	}
 	return 0; // off
 }
 
 int update_launcher_lift_input() {
-	if (controller.get_digital(DIGITAL_Y)) {
+	if (master.get_digital(DIGITAL_L1)) {
 		return 1; // up
 	}
-	if (controller.get_digital(DIGITAL_B)) {
+	if (master.get_digital(DIGITAL_L2)) {
 		return 2; // down
 	}
 	return 0; // off
 }
 
 int update_intake_input() {
-	if (controller.get_digital(DIGITAL_R1)) {
+	if (master.get_digital(DIGITAL_R1)) {
 		return 1; // consume
 	} 
-	else if (controller.get_digital(DIGITAL_R2)) {
+	else if (master.get_digital(DIGITAL_R2)) {
 		return 2; // eject
 	}
-	else if (controller.get_digital(DIGITAL_X)) {
+	else if (master.get_digital(DIGITAL_X)) {
 		return 0; // off
 	}
 	return -1; // error
 }
 
-int update_flap_input() {
-	if (controller.get_digital(DIGITAL_L1)) {
-		return 1; // up
-	}
-	if (controller.get_digital(DIGITAL_L2)) {
-		return 2; // down
-	}
-	return 0; // off
-}
-
 // ===== LOGISTICS =====
-
-void tank_drive(int leftInput, int rightInput) {
-	left_motors(leftInput);
-	right_motors(rightInput);
-}
-
-void split_arcade_drive(int xInput, int yInput) {
-	if (xInput == 0 && yInput != 0)
-		tank_drive(yInput, yInput);
-
-	if (xInput != 0 && yInput == 0)
-		tank_drive(xInput, -xInput);
-
-	if (xInput > 0 && yInput != 0)
-		tank_drive(xInput, 0);
-
-	if (xInput < 0 && yInput != 0)
-		tank_drive(0, xInput);
-}
-
-void left_motors(int speed) {
-    motor_left_a = speed;
-    motor_left_b = speed;
-    motor_left_c = speed;
-}
-
-void right_motors(int speed) {
-	motor_right_a = speed;
-	motor_right_b = speed;
-	motor_right_c = speed;
-}
 
 // Launch Motor : type --> HOLD
 void launcher(int speed, int state) {
@@ -264,16 +324,4 @@ void intake(int speed, int state) {
 		pros::delay(10);
 	}
 	pros::delay(10);
-}
-
-// Flap Pistons : type --> TOGGLE
-void flaps(int state) {
-	if (state == 1) {
-		piston_flap_a.set_value(HIGH);
-		pros::delay(100);
-	}
-	if (state == 2) {
-		piston_flap_a.set_value(LOW);
-		pros::delay(100);
-	}
 }

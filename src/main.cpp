@@ -33,8 +33,8 @@ pros::Motor motor_launch_lift(6, pros::E_MOTOR_GEAR_GREEN, false, pros::E_MOTOR_
 pros::Motor motor_intake(4, pros::E_MOTOR_GEAR_GREEN, false, pros::E_MOTOR_ENCODER_DEGREES);
 
 // pistons
-pros::ADIDigitalOut piston_flaps(1);
-// pros::ADIDigitalOut piston_flap_b(1);
+pros::ADIDigitalOut piston_flap_a(1);
+pros::ADIDigitalOut piston_flap_b(2);
 
 // Chassis constructor
 Drive chassis (
@@ -240,11 +240,13 @@ void update_flaps_state(PistonState &state) {
     pros::delay(400);
     if (state == up) {
       state = down;
-      piston_flaps.set_value(HIGH);
+      piston_flap_a.set_value(HIGH);
+      piston_flap_b.set_value(HIGH);
     }
     else {
       state = up;
-      piston_flaps.set_value(LOW);
+      piston_flap_a.set_value(LOW);
+      piston_flap_b.set_value(LOW);
     }
     pros::delay(100); 
 	}

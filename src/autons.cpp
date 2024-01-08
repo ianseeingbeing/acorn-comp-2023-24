@@ -244,3 +244,32 @@ void interfered_example() {
 // . . .
 // Make your own autonomous functions here!
 // . . .
+
+void drive(int pid) {
+  chassis.set_drive_pid(pid, DRIVE_SPEED);
+  chassis.wait_drive();
+}
+void turn(int deg) {
+  chassis.set_turn_pid(deg, TURN_SPEED);
+  chassis.wait_drive();
+}
+
+void auton1() {
+  //get first ball
+  turn(65);
+  drive(1650);
+  turn(180);
+  drive(700);
+  drive(-400);
+
+  //get second ball`
+  turn(0);
+  // NOTE: turn on intake
+  motor_intake = 100;
+  drive(800);
+  drive(-300);
+  turn(180);
+  motor_intake = 0;
+  drive(750);
+  drive(-300);
+}

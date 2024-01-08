@@ -45,6 +45,7 @@
 
 // More includes here...
 #include "autons.hpp"
+#include "components.hpp"
 
 /**
  * If you find doing pros::Motor() to be tedious and you'd prefer just to do

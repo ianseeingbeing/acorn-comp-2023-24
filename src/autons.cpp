@@ -7,7 +7,7 @@
 /////
 
 
-const int DRIVE_SPEED = 110; // This is 110/127 (around 87% of max speed).  We don't suggest making this 127.
+const int DRIVE_SPEED = 127; // This is 110/127 (around 87% of max speed).  We don't suggest making this 127.
                              // If this is 127 and the robot tries to heading correct, it's only correcting by
                              // making one side slower.  When this is 87%, it's correcting by making one side
                              // faster and one side slower, giving better heading correction.
@@ -254,22 +254,58 @@ void turn(int deg) {
   chassis.wait_drive();
 }
 
-void auton1() {
-  //get first ball
+void auton_team_goal_side() {
+  // put held ball int goal
   turn(65);
   drive(1650);
   turn(180);
   drive(700);
+  intake("reverse");
   drive(-400);
+  intake("off");
 
-  //get second ball`
+  // get second ball and put in goal
   turn(0);
-  // NOTE: turn on intake
-  motor_intake = 100;
-  drive(800);
+  intake("on");
+  drive(700);
   drive(-300);
   turn(180);
-  motor_intake = 0;
-  drive(750);
+  intake("off");
+  drive(850);
+  intake("reverse");
   drive(-300);
+  intake("off");
+}
+
+void auton_opp_goal_side_1() {
+  // knock in the touching ball into goal
+  turn(-35);
+  drive(-700);
+  turn(0);
+  drive(-450);
+  
+  // get into postion to lauch balls over the court
+  turn(-45);
+  drive(550);
+  turn(-100);
+  drive(-300);
+
+}
+void auton_opp_goal_side_2() {
+  // knock in the touching ball into goal
+  turn(-35);
+  drive(-700);
+  turn(0);
+  drive(-450);
+
+  // knock out corner ball
+  drive(200);
+  turn(-45);
+  drive(800);
+  turn(-90);
+  right_piston("on");
+  drive(300);
+  right_piston("off");
+  drive(500);
+
 }

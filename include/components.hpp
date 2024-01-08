@@ -1,6 +1,5 @@
 #include "main.h"
 
-
 // launcher
 extern pros::Motor motor_launch;
 extern pros::Motor motor_launch_lift;
@@ -14,10 +13,13 @@ extern pros::ADIDigitalOut piston_flap_b;
 
 void update_drivetrain_state(std::string&);
 void update_flaps_state(std::string&);
-int update_launcher_input();
-int update_launcher_lift_input();
-int update_intake_input();
+std::string update_launcher_input();
+std::string update_launcher_lift_input();
+std::string update_intake_input();
 
-void launcher(int, int);
-void launcher_lift(int, int);
-void intake(int, int);
+void launcher(std::string state);
+void launcher_lift(std::string state);
+void intake(std::string state);
+
+void right_piston(std::string state);
+void left_piston(std::string state);

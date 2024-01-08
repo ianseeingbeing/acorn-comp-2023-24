@@ -19,4 +19,6 @@ void two_mogo_constants();
 // custom 
 void drive(int);
 void turn(int);
-void auton1();
+void auton_team_goal_side();
+void auton_opp_goal_side_1();
+void auton_opp_goal_side_2();

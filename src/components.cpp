@@ -1,5 +1,9 @@
 #include "main.h"
 
+const int LAUNCH_SPEED = -127;
+const int LAUNCH_LIFT_SPEED = 80;
+const int INTAKE_SPEED = 110;
+
 // launcher
 pros::Motor motor_launch(7, pros::E_MOTOR_GEAR_BLUE, false, pros::E_MOTOR_ENCODER_DEGREES);
 pros::Motor motor_launch_lift(6, pros::E_MOTOR_GEAR_GREEN, false, pros::E_MOTOR_ENCODER_DEGREES);
@@ -47,76 +51,91 @@ void update_flaps_state(std::string &state) {
 	}
 }
 
-int update_launcher_input() {
+std::string update_launcher_input() {
 	if (master.get_digital(DIGITAL_A)) {
-		return 1; // on
+		return "on";
 	}
-	return 0; // off
+	return "off";
 }
 
-int update_launcher_lift_input() {
+std::string update_launcher_lift_input() {
 	if (master.get_digital(DIGITAL_L1)) {
-		return 1; // up
+		return "up";
 	}
 	if (master.get_digital(DIGITAL_L2)) {
-		return 2; // down
+		return "down";
 	}
-	return 0; // off
+	return "off";
 }
 
-int update_intake_input() {
+std::string update_intake_input() {
 	if (master.get_digital(DIGITAL_R1)) {
-		return 1; // consume
+		return "on";
 	} 
 	else if (master.get_digital(DIGITAL_R2)) {
-		return 2; // eject
+		return "reverse";
 	}
 	else if (master.get_digital(DIGITAL_X)) {
-		return 0; // off
+		return "off";
 	}
-	return -1; // error
+	return "error";
 }
 
 // ===== LOGISTICS =====
 
 // Launch Motor : type --> HOLD
-void launcher(int speed, int state) {
-	if (state == 1) {
-		motor_launch = speed; //
+void launcher(std::string state) {
+	if (state == "on") {
+		motor_launch = LAUNCH_SPEED;
 	}
-	if (state != 1) {
-		motor_launch = 0; //
+	else if (state == "off") {
+		motor_launch = 0; 
 	}
 	pros::delay(10);
 }
 
 // Launcher Lift Motor : type --> HOLD
-void launcher_lift(int speed, int state) {
-	if (state == 1) { // up
-		motor_launch_lift = speed;
+void launcher_lift(std::string state) {
+	if (state == "up") {
+		motor_launch_lift = LAUNCH_LIFT_SPEED;
 	}
-	if (state == 2) { // down
-		motor_launch_lift = -speed;
+	else if (state == "down") {
+		motor_launch_lift = -LAUNCH_LIFT_SPEED;
 	}
-	if (state < 1) {
+	else if (state == "off") {
 		motor_launch_lift = 0;
 	}
 	pros::delay(10);
 }
 
 // Intake Motor : type --> TOGGLE
-void intake(int speed, int state) {
-	if (state == 1) {
-		motor_intake = -speed; // in
-		pros::delay(10);
+void intake(std::string state) {
+	if (state == "on") {
+		motor_intake = -INTAKE_SPEED;
 	}
-	if (state == 2) {
-		motor_intake = speed; // out
-		pros::delay(10);
+	else if (state == "reverse") {
+		motor_intake = INTAKE_SPEED;
 	}
-	if (state == 0) {
+	else if (state == "off") {
 		motor_intake = 0;
-		pros::delay(10);
 	}
 	pros::delay(10);
+}
+
+void right_piston(std::string state) {
+    if (state == "on") {
+        piston_flap_a.set_value(HIGH);
+    }
+    else if (state == "off") {
+        piston_flap_a.set_value(LOW);
+    }
+}
+
+void left_piston(std::string state) {
+    if (state == "on") {
+        piston_flap_b.set_value(HIGH);
+    }
+    else if (state == "off") {
+        piston_flap_b.set_value(LOW);
+    }
 }

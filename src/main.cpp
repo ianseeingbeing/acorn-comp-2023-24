@@ -1,10 +1,5 @@
 #include "main.h"
 
-const int LAUNCH_SPEED = -127;
-const int LAUNCH_LIFT_SPEED = 80;
-const int INTAKE_SPEED = 100;
-
-
 // Chassis constructor
 Drive chassis (
   // Left Chassis Ports (negative port will reverse it!)
@@ -49,8 +44,6 @@ Drive chassis (
   // 3 Wire Port Expander Smart Port
   // ,1
 );
-
-
 
 /**
  * Runs initialization code. This occurs as soon as the program is started.
@@ -136,7 +129,9 @@ void autonomous() {
   chassis.set_drive_brake(MOTOR_BRAKE_HOLD); // Set motors to hold.  This helps autonomous consistency.
 
   ez::as::auton_selector.call_selected_auton(); // Calls selected auton from autonomous selector.
-  auton1();
+  // auton_team_goal_side();
+  // auton_opp_goal_side_1();
+  auton_opp_goal_side_2();
 
 }
 
@@ -180,9 +175,9 @@ void opcontrol() {
     update_flaps_state(pistonState);    
 
     // controlls for other motors
-		launcher(LAUNCH_SPEED, update_launcher_input());
-		launcher_lift(LAUNCH_LIFT_SPEED, update_launcher_lift_input());
-		intake(INTAKE_SPEED, update_intake_input());
+		launcher(update_launcher_input());
+		launcher_lift(update_launcher_lift_input());
+		intake(update_intake_input());
 
     pros::delay(ez::util::DELAY_TIME); // This is used for timer calculations!  Keep this ez::util::DELAY_TIME
   }

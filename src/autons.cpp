@@ -254,7 +254,7 @@ void turn(int deg) {
   chassis.wait_drive();
 }
 
-void auton_team_goal_side() {
+void auton_team_goal() {
   // put held ball int goal
   turn(65);
   drive(1650);
@@ -277,7 +277,7 @@ void auton_team_goal_side() {
   intake("off");
 }
 
-void auton_opp_goal_side_1() {
+void auton_opp_goal() {
   // knock in the touching ball into goal
   turn(-35);
   drive(-700);
@@ -307,5 +307,26 @@ void auton_opp_goal_side_2() {
   drive(300);
   right_piston("off");
   drive(500);
+
+}
+
+void skills() {
+  // push ball into goal
+  turn(-35);
+  drive(-700);
+  turn(0);
+  drive(-450);
+  
+  // get into postion to lauch balls over the court
+  turn(-45);
+  drive(550);
+  turn(-100);
+  drive(-300);
+
+  motor_launch_lift = 80;
+  motor_launch = -127;
+  pros::delay(60000);
+  motor_launch_lift = 0;
+  motor_launch = 0;
 
 }

@@ -256,10 +256,10 @@ void turn(int deg) {
 
 void auton() {
   if (auton_switch.get_value_calibrated() < 20) { 
-    auton_team_goal(); // twist tward intake
+    auton_opp_goal(); // tiwst tward back
   }
   else if (auton_switch.get_value_calibrated() > 4075) {
-    auton_opp_goal(); // tiwst tward back
+    auton_team_goal(); // twist tward intake
   }
   else {
     // skills();

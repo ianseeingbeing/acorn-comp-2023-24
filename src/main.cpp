@@ -132,8 +132,8 @@ void autonomous() {
   ez::as::auton_selector.call_selected_auton(); // Calls selected auton from autonomous selector.
 
   auton(); /*
-            Twist Potentiometer Tward Intake --> same side as goal
-            Twist Potentiometer Tward Back --> opp side of goal
+            Twist Potentiometer Tward Intake --> same side of goal
+            Twist Potentiometer Tward Back --> opp side as goal
             Twist to sit in middle --> skills 
           */ 
   // auton_team_goal();

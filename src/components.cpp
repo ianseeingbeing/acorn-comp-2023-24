@@ -1,6 +1,6 @@
 #include "main.h"
 
-const int LAUNCH_SPEED = -127;
+const int LAUNCH_SPEED = 127;
 const int LAUNCH_LIFT_SPEED = 80;
 const int INTAKE_SPEED = 110;
 
@@ -14,6 +14,7 @@ pros::Motor motor_intake(4, pros::E_MOTOR_GEAR_GREEN, false, pros::E_MOTOR_ENCOD
 // pistons
 pros::ADIDigitalOut piston_flap_a(1);
 pros::ADIDigitalOut piston_flap_b(2);
+pros::ADIAnalogIn auton_switch(3);
 
 void update_drivetrain_state(std::string &drive) {
 	if (master.get_digital(DIGITAL_DOWN)) {
@@ -30,7 +31,7 @@ void update_drivetrain_state(std::string &drive) {
     chassis.tank();
   }
   if (drive == "splitArcade") {
-    chassis.arcade_flipped(ez::SPLIT);
+    chassis.arcade_standard(ez::SPLIT);
   }
 }
 

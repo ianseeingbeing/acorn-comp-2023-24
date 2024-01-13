@@ -19,7 +19,10 @@ void two_mogo_constants();
 // custom 
 void drive(int);
 void turn(int);
+
+// autonomous
+void auton();
 void auton_team_goal();
 void auton_opp_goal();
-void auton_opp_goal_side_2();
 void skills();
+void test();

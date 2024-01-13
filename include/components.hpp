@@ -10,6 +10,7 @@ extern pros::Motor motor_intake;
 // pistons
 extern pros::ADIDigitalOut piston_flap_a;
 extern pros::ADIDigitalOut piston_flap_b;
+extern pros::ADIAnalogIn auton_switch;
 
 void update_drivetrain_state(std::string&);
 void update_flaps_state(std::string&);

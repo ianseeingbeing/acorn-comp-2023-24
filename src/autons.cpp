@@ -254,6 +254,18 @@ void turn(int deg) {
   chassis.wait_drive();
 }
 
+void auton() {
+  if (auton_switch.get_value_calibrated() < 20) { 
+    auton_team_goal(); // twist tward intake
+  }
+  else if (auton_switch.get_value_calibrated() > 4075) {
+    auton_opp_goal(); // tiwst tward back
+  }
+  else {
+    // skills();
+  }
+}
+
 void auton_team_goal() {
   // put held ball int goal
   turn(65);
@@ -279,54 +291,39 @@ void auton_team_goal() {
 
 void auton_opp_goal() {
   // knock in the touching ball into goal
-  turn(-35);
-  drive(-700);
+  turn(-30);
+  drive(-1000);
   turn(0);
-  drive(-450);
+  drive(350);
+  turn(-291);
   
-  // get into postion to lauch balls over the court
-  turn(-45);
-  drive(550);
-  turn(-100);
-  drive(-300);
-
-}
-void auton_opp_goal_side_2() {
-  // knock in the touching ball into goal
-  turn(-35);
-  drive(-700);
-  turn(0);
-  drive(-450);
-
-  // knock out corner ball
-  drive(200);
-  turn(-45);
-  drive(800);
-  turn(-90);
-  right_piston("on");
-  drive(300);
-  right_piston("off");
-  drive(500);
-
 }
 
 void skills() {
   // push ball into goal
-  turn(-35);
-  drive(-700);
+  turn(-30);
+  drive(-1050);
   turn(0);
-  drive(-450);
+  drive(350);
+  turn(-291);
   
-  // get into postion to lauch balls over the court
-  turn(-45);
-  drive(550);
-  turn(-100);
-  drive(-300);
-
-  motor_launch_lift = 80;
-  motor_launch = -127;
+  motor_launch_lift = 100;
+  motor_launch = 127;
   pros::delay(60000);
   motor_launch_lift = 0;
   motor_launch = 0;
 
+}
+
+
+void test() {
+  if (auton_switch.get_value_calibrated() < 20) { 
+    motor_intake = 100; // twist twards back
+  }
+  else if (auton_switch.get_value_calibrated() > 4075) {
+    motor_launch_lift = 100; // twist twards intake
+  }
+  else {
+    motor_launch = 100; // in middle
+  }
 }

@@ -52,6 +52,7 @@ Drive chassis (
  * to keep execution time for this mode under a few seconds.
  */
 void initialize() {
+  auton_switch.calibrate();
   // Print our branding over your terminal :D
   ez::print_ez_template();
   
@@ -129,9 +130,16 @@ void autonomous() {
   chassis.set_drive_brake(MOTOR_BRAKE_HOLD); // Set motors to hold.  This helps autonomous consistency.
 
   ez::as::auton_selector.call_selected_auton(); // Calls selected auton from autonomous selector.
-  // auton_team_goal_side();
-  // auton_opp_goal_side_1();
-  auton_opp_goal_side_2();
+
+  auton(); /*
+            Twist Potentiometer Tward Intake --> same side as goal
+            Twist Potentiometer Tward Back --> opp side of goal
+            Twist to sit in middle --> skills 
+          */ 
+  // auton_team_goal();
+  // auton_opp_goal();
+  // skills();
+  // test();
 
 }
 
@@ -157,10 +165,10 @@ void opcontrol() {
   std::string drivetrain = "tank";
   std::string pistonState = "up";
 
-  motor_launch_lift.set_brake_mode(MOTOR_BRAKE_HOLD);
-  motor_intake.set_brake_mode(MOTOR_BRAKE_HOLD);
 
   while (true) {
+    motor_launch_lift.set_brake_mode(MOTOR_BRAKE_HOLD);
+    motor_intake.set_brake_mode(MOTOR_BRAKE_HOLD);
 
     // EZ_Template controls
     // chassis.tank(); // Tank control

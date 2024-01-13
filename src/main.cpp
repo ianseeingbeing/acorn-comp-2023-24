@@ -1,51 +1,6 @@
 #include "main.h"
 
-// Chassis constructor
-Drive chassis (
-  // Left Chassis Ports (negative port will reverse it!)
-  //   the first port is the sensored port (when trackers are not used!)
-  {-10, -9, 8}
-
-  // Right Chassis Ports (negative port will reverse it!)
-  //   the first port is the sensored port (when trackers are not used!)
-  ,{1, 2, -3}
-
-  // IMU Port 
-  //    (port for the gyroscope sensor)
-  ,11
-
-  // Wheel Diameter (Remember, 4" wheels are actually 4.125!)
-  //    (or tracking wheel diameter)
-  ,3.25
-
-  // Cartridge RPM
-  //   (or tick per rotation if using tracking wheels)
-  ,6000
-
-  // External Gear Ratio (MUST BE DECIMAL)
-  //    (or gear ratio of tracking wheel)
-  // eg. if your drive is 84:36 where the 36t is powered, your RATIO would be 2.333.
-  // eg. if your drive is 36:60 where the 60t is powered, your RATIO would be 0.6.
-  ,0.6
-
-
-  // Uncomment if using tracking wheels
-  /*
-  // Left Tracking Wheel Ports (negative port will reverse it!)
-  // ,{1, 2} // 3 wire encoder
-  // ,8 // Rotation sensor
-
-  // Right Tracking Wheel Ports (negative port will reverse it!)
-  // ,{-3, -4} // 3 wire encoder
-  // ,-9 // Rotation sensor
-  */
-
-  // Uncomment if tracking wheels are plugged into a 3 wire expander
-  // 3 Wire Port Expander Smart Port
-  // ,1
-);
-
-/**
+/*
  * Runs initialization code. This occurs as soon as the program is started.
  *
  * All other competition modes are blocked by initialize; it is recommended
@@ -86,7 +41,7 @@ void initialize() {
 
 
 
-/**
+/*
  * Runs while the robot is in the disabled state of Field Management System or
  * the VEX Competition Switch, following either autonomous or opcontrol. When
  * the robot is enabled, this task will exit.
@@ -97,7 +52,7 @@ void disabled() {
 
 
 
-/**
+/*
  * Runs after initialize(), and before autonomous when connected to the Field
  * Management System or the VEX Competition Switch. This is intended for
  * competition-specific initialization routines, such as an autonomous selector
@@ -112,7 +67,7 @@ void competition_initialize() {
 
 
 
-/**
+/*
  * Runs the user autonomous code. This function will be started in its own task
  * with the default priority and stack size whenever the robot is enabled via
  * the Field Management System or the VEX Competition Switch in the autonomous
@@ -132,20 +87,14 @@ void autonomous() {
   ez::as::auton_selector.call_selected_auton(); // Calls selected auton from autonomous selector.
 
   auton(); /*
-            Twist Potentiometer Tward Intake --> same side of goal
-            Twist Potentiometer Tward Back --> opp side as goal
+            Twist Potentiometer Totally Tward Intake --> same side of goal
+            Twist Potentiometer Tottaly Tward Back --> opp side as goal
             Twist to sit in middle --> skills 
           */ 
-  // auton_team_goal();
-  // auton_opp_goal();
-  // skills();
-  // test();
-
 }
 
 
-
-/**
+/*
  * Runs the operator control code. This function will be started in its own task
  * with the default priority and stack size whenever the robot is enabled via
  * the Field Management System or the VEX Competition Switch in the operator
@@ -165,7 +114,6 @@ void opcontrol() {
   std::string drivetrain = "tank";
   std::string pistonState = "up";
 
-
   while (true) {
     motor_launch_lift.set_brake_mode(MOTOR_BRAKE_HOLD);
     motor_intake.set_brake_mode(MOTOR_BRAKE_HOLD);
@@ -177,12 +125,11 @@ void opcontrol() {
     // chassis.arcade_flipped(ez::SPLIT); // Flipped split arcade
     // chassis.arcade_flipped(ez::SINGLE); // Flipped single arcade
 
-
-    // updates enums 
+    // updates groups 
     update_drivetrain_state(drivetrain);
     update_flaps_state(pistonState);    
 
-    // controlls for other motors
+    // single motors
 		launcher(update_launcher_input());
 		launcher_lift(update_launcher_lift_input());
 		intake(update_intake_input());

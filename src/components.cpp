@@ -1,8 +1,54 @@
 #include "main.h"
 
-const int LAUNCH_SPEED = 127;
-const int LAUNCH_LIFT_SPEED = 80;
-const int INTAKE_SPEED = 110;
+const std::vector<int> leftChassisMotors = {-10, -9, 8};
+const std::vector<int> rightChassisMotors = {1, 2, -3};
+
+// const std::vector<int> leftChassisMotorsReversed = {10, 9, -8};
+// const std::vector<int> rightChassisMotorsReversed = {-1, -2, 3};
+
+Drive chassis (
+  // Left Chassis Ports (negative port will reverse it!)
+  //   the first port is the sensored port (when trackers are not used!)
+  leftChassisMotors
+
+  // Right Chassis Ports (negative port will reverse it!)
+  //   the first port is the sensored port (when trackers are not used!)
+  ,rightChassisMotors
+
+  // IMU Port 
+  //    (port for the gyroscope sensor)
+  ,11
+
+  // Wheel Diameter (Remember, 4" wheels are actually 4.125!)
+  //    (or tracking wheel diameter)
+  ,3.25
+
+  // Cartridge RPM
+  //   (or tick per rotation if using tracking wheels)
+  ,6000
+
+  // External Gear Ratio (MUST BE DECIMAL)
+  //    (or gear ratio of tracking wheel)
+  // eg. if your drive is 84:36 where the 36t is powered, your RATIO would be 2.333.
+  // eg. if your drive is 36:60 where the 60t is powered, your RATIO would be 0.6.
+  ,0.6
+
+
+  // Uncomment if using tracking wheels
+  /*
+  // Left Tracking Wheel Ports (negative port will reverse it!)
+  // ,{1, 2} // 3 wire encoder
+  // ,8 // Rotation sensor
+
+  // Right Tracking Wheel Ports (negative port will reverse it!)
+  // ,{-3, -4} // 3 wire encoder
+  // ,-9 // Rotation sensor
+  */
+
+  // Uncomment if tracking wheels are plugged into a 3 wire expander
+  // 3 Wire Port Expander Smart Port
+  // ,1
+);
 
 // launcher
 pros::Motor motor_launch(7, pros::E_MOTOR_GEAR_BLUE, false, pros::E_MOTOR_ENCODER_DEGREES);
@@ -14,129 +60,6 @@ pros::Motor motor_intake(4, pros::E_MOTOR_GEAR_GREEN, false, pros::E_MOTOR_ENCOD
 // pistons
 pros::ADIDigitalOut piston_flap_a(1);
 pros::ADIDigitalOut piston_flap_b(2);
+
+// potentiometer
 pros::ADIAnalogIn auton_switch(3);
-
-void update_drivetrain_state(std::string &drive) {
-	if (master.get_digital(DIGITAL_DOWN)) {
-    pros::delay(500);
-		if ("tank" == drive) {
-      drive = "splitArcade";
-    } 
-    else {
-      drive = "tank";
-    }
-		pros::delay(500);	
-  }
-  if (drive == "tank") {
-    chassis.tank();
-  }
-  if (drive == "splitArcade") {
-    chassis.arcade_standard(ez::SPLIT);
-  }
-}
-
-void update_flaps_state(std::string &state) {
-	if (master.get_digital(DIGITAL_UP)) {
-    pros::delay(400);
-    if (state == "up") {
-      state = "down";
-      piston_flap_a.set_value(HIGH);
-      piston_flap_b.set_value(HIGH);
-    }
-    else {
-      state = "up";
-      piston_flap_a.set_value(LOW);
-      piston_flap_b.set_value(LOW);
-    }
-    pros::delay(100); 
-	}
-}
-
-std::string update_launcher_input() {
-	if (master.get_digital(DIGITAL_A)) {
-		return "on";
-	}
-	return "off";
-}
-
-std::string update_launcher_lift_input() {
-	if (master.get_digital(DIGITAL_L1)) {
-		return "up";
-	}
-	if (master.get_digital(DIGITAL_L2)) {
-		return "down";
-	}
-	return "off";
-}
-
-std::string update_intake_input() {
-	if (master.get_digital(DIGITAL_R1)) {
-		return "on";
-	} 
-	else if (master.get_digital(DIGITAL_R2)) {
-		return "reverse";
-	}
-	else if (master.get_digital(DIGITAL_X)) {
-		return "off";
-	}
-	return "error";
-}
-
-// ===== LOGISTICS =====
-
-// Launch Motor : type --> HOLD
-void launcher(std::string state) {
-	if (state == "on") {
-		motor_launch = LAUNCH_SPEED;
-	}
-	else if (state == "off") {
-		motor_launch = 0; 
-	}
-	pros::delay(10);
-}
-
-// Launcher Lift Motor : type --> HOLD
-void launcher_lift(std::string state) {
-	if (state == "up") {
-		motor_launch_lift = LAUNCH_LIFT_SPEED;
-	}
-	else if (state == "down") {
-		motor_launch_lift = -LAUNCH_LIFT_SPEED;
-	}
-	else if (state == "off") {
-		motor_launch_lift = 0;
-	}
-	pros::delay(10);
-}
-
-// Intake Motor : type --> TOGGLE
-void intake(std::string state) {
-	if (state == "on") {
-		motor_intake = -INTAKE_SPEED;
-	}
-	else if (state == "reverse") {
-		motor_intake = INTAKE_SPEED;
-	}
-	else if (state == "off") {
-		motor_intake = 0;
-	}
-	pros::delay(10);
-}
-
-void right_piston(std::string state) {
-    if (state == "on") {
-        piston_flap_a.set_value(HIGH);
-    }
-    else if (state == "off") {
-        piston_flap_a.set_value(LOW);
-    }
-}
-
-void left_piston(std::string state) {
-    if (state == "on") {
-        piston_flap_b.set_value(HIGH);
-    }
-    else if (state == "off") {
-        piston_flap_b.set_value(LOW);
-    }
-}

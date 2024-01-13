@@ -245,6 +245,18 @@ void interfered_example() {
 // Make your own autonomous functions here!
 // . . .
 
+void auton() {
+  if (auton_switch.get_value_calibrated() < 30) { 
+    auton_opp_goal(); // tiwst tward back
+  }
+  else if (auton_switch.get_value_calibrated() > 4065) {
+    auton_team_goal(); // twist tward intake
+  }
+  else {
+    skills(); // put in center
+  }
+}
+
 void drive(int pid) {
   chassis.set_drive_pid(pid, DRIVE_SPEED);
   chassis.wait_drive();
@@ -252,18 +264,6 @@ void drive(int pid) {
 void turn(int deg) {
   chassis.set_turn_pid(deg, TURN_SPEED);
   chassis.wait_drive();
-}
-
-void auton() {
-  if (auton_switch.get_value_calibrated() < 20) { 
-    auton_opp_goal(); // tiwst tward back
-  }
-  else if (auton_switch.get_value_calibrated() > 4075) {
-    auton_team_goal(); // twist tward intake
-  }
-  else {
-    // skills();
-  }
 }
 
 void auton_team_goal() {
@@ -312,18 +312,8 @@ void skills() {
   pros::delay(60000);
   motor_launch_lift = 0;
   motor_launch = 0;
-
 }
 
-
 void test() {
-  if (auton_switch.get_value_calibrated() < 20) { 
-    motor_intake = 100; // twist twards back
-  }
-  else if (auton_switch.get_value_calibrated() > 4075) {
-    motor_launch_lift = 100; // twist twards intake
-  }
-  else {
-    motor_launch = 100; // in middle
-  }
+
 }

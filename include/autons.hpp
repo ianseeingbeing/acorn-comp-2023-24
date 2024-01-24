@@ -22,7 +22,7 @@ void turn(int);
 
 // autonomous
 void auton();
-void auton_team_goal();
-void auton_opp_goal();
+void auton_far_side();
+void auton_near_side();
 void skills();
 void test();

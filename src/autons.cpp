@@ -247,10 +247,10 @@ void interfered_example() {
 
 void auton() {
   if (auton_switch.get_value_calibrated() < 30) { 
-    auton_opp_goal(); // tiwst tward back
+    auton_near_side(); // tiwst tward back
   }
   else if (auton_switch.get_value_calibrated() > 4065) {
-    auton_team_goal(); // twist tward intake
+    auton_far_side(); // twist tward intake
   }
   else {
     skills(); // put in center
@@ -266,7 +266,7 @@ void turn(int deg) {
   chassis.wait_drive();
 }
 
-void auton_team_goal() {
+void auton_far_side() {
   // put held ball int goal
   turn(65);
   drive(1650);
@@ -289,10 +289,10 @@ void auton_team_goal() {
   intake("off");
 }
 
-void auton_opp_goal() {
+void auton_near_side() {
   // knock in the touching ball into goal
   turn(-30);
-  drive(-1000);
+  drive(-1050);
   turn(0);
   drive(350);
   turn(-291);
@@ -309,9 +309,15 @@ void skills() {
   
   motor_launch_lift = 100;
   motor_launch = 127;
-  pros::delay(60000);
+  pros::delay(30000); // 30s
   motor_launch_lift = 0;
   motor_launch = 0;
+
+  turn(-111);
+  drive(-800);
+  turn(-45);
+  drive(-600);
+  drive(-800);
 }
 
 void test() {

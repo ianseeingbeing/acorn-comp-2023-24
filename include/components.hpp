@@ -3,9 +3,6 @@
 extern const std::vector<int> leftChassisMotors;
 extern const std::vector<int> rightChassisMotors;
 
-// extern std::vector<int> leftChassisMotorsReversed;
-// extern std::vector<int> rightChassisMotorsReversed;
-
 // chassis
 extern Drive chassis;
 

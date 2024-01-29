@@ -246,80 +246,84 @@ void interfered_example() {
 // . . .
 
 void auton() {
-  if (auton_switch.get_value_calibrated() < 30) { 
-    auton_near_side(); // tiwst tward back
-  }
-  else if (auton_switch.get_value_calibrated() > 4065) {
-    auton_far_side(); // twist tward intake
-  }
-  else {
-    skills(); // put in center
-  }
+	if (auton_switch.get_value_calibrated() < 30) { 
+		auton_near_side(); // tiwst tward back
+	}
+	else if (auton_switch.get_value_calibrated() > 4065) {
+		auton_far_side(); // twist tward intake
+	}
+	else {
+		auton_skills(); // put in center
+	}
 }
 
+// simplify auton
 void drive(int pid) {
-  chassis.set_drive_pid(pid, DRIVE_SPEED);
-  chassis.wait_drive();
+	chassis.set_drive_pid(pid, DRIVE_SPEED);
+	chassis.wait_drive();
 }
+
 void turn(int deg) {
-  chassis.set_turn_pid(deg, TURN_SPEED);
-  chassis.wait_drive();
+	chassis.set_turn_pid(deg, TURN_SPEED);
+	chassis.wait_drive();
 }
 
+// bot is opposite where team stands
 void auton_far_side() {
-  // put held ball int goal
-  turn(65);
-  drive(1650);
-  turn(180);
-  drive(700);
-  intake("reverse");
-  drive(-400);
-  intake("off");
+	// put held ball int goal
+	turn(65);
+	drive(1650);
+	turn(180);
+	drive(700);
+	intake("reverse");
+	drive(-400);
+	intake("off");
 
-  // get second ball and put in goal
-  turn(0);
-  intake("on");
-  drive(700);
-  drive(-300);
-  turn(180);
-  intake("off");
-  drive(850);
-  intake("reverse");
-  drive(-300);
-  intake("off");
+	// get second ball and put in goal
+	turn(0);
+	intake("on");
+	drive(700);
+	drive(-300);
+	turn(180);
+	intake("off");
+	drive(850);
+	intake("reverse");
+	drive(-300);
+	intake("off");
 }
 
+// bot is next to where team stands
 void auton_near_side() {
-  // knock in the touching ball into goal
-  turn(-30);
-  drive(-1050);
-  turn(0);
-  drive(350);
-  turn(-291);
+	// knock in the touching ball into goal
+	turn(-30);
+	drive(-1050);
+	turn(0);
+	drive(350);
+	turn(-291);
   
 }
 
-void skills() {
-  // push ball into goal
-  turn(-30);
-  drive(-1050);
-  turn(0);
-  drive(350);
-  turn(-291);
-  
-  motor_launch_lift = 100;
-  motor_launch = 127;
-  pros::delay(30000); // 30s
-  motor_launch_lift = 0;
-  motor_launch = 0;
+void auton_skills() {
+	// push ball into goal
+	turn(-30);
+	drive(-1050);
+	turn(0);
+	drive(350);
+	turn(-291);
+	
+	motor_launch_lift = 100;
+	motor_launch = 127;
+	pros::delay(35000); // 35s
+	motor_launch_lift = 0;
+	motor_launch = 0;
 
-  turn(-111);
-  drive(-800);
-  turn(-45);
-  drive(-600);
-  drive(-800);
+	turn(-111);
+	drive(-800);
+	turn(-45);
+	drive(-600);
+	drive(-800);
 }
 
 void test() {
-
+	
 }

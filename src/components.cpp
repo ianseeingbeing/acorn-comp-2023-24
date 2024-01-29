@@ -3,9 +3,6 @@
 const std::vector<int> leftChassisMotors = {-10, -9, 8};
 const std::vector<int> rightChassisMotors = {1, 2, -3};
 
-// const std::vector<int> leftChassisMotorsReversed = {10, 9, -8};
-// const std::vector<int> rightChassisMotorsReversed = {-1, -2, 3};
-
 Drive chassis (
   // Left Chassis Ports (negative port will reverse it!)
   //   the first port is the sensored port (when trackers are not used!)

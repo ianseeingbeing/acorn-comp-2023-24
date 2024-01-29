@@ -22,17 +22,17 @@ void update_drivetrain_state(std::string &drive) {
 	}
 }
 
-void update_flaps_state(std::string &state) {
+void update_wings_state(std::string &state) {
 	if (master.get_digital(DIGITAL_UP)) {
 		pros::delay(400);
-		if (state == "up") {
-			state = "down";
-			left_piston("high");
-			right_piston("high");
+		if ("high" == state) {
+			state = "low";
+			left_wing(state);
+			right_wing(state);
 		} else {
-			state = "up";
-			left_piston("low");
-			left_piston("low");
+			state = "high";
+			left_wing(state);
+			left_wing(state);
 		}
 		pros::delay(100); 
 	}
@@ -107,7 +107,7 @@ void intake(std::string state) {
 	pros::delay(10);
 }
 
-void right_piston(std::string state) {
+void left_wing(std::string state) {
     if (state == "high") {
         piston_flap_a.set_value(HIGH);
     }
@@ -116,7 +116,7 @@ void right_piston(std::string state) {
     }
 }
 
-void left_piston(std::string state) {
+void right_wing(std::string state) {
     if (state == "high") {
         piston_flap_b.set_value(HIGH);
     }

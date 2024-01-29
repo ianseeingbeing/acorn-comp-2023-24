@@ -112,7 +112,7 @@ void opcontrol() {
   chassis.set_drive_brake(MOTOR_BRAKE_COAST);
 
   std::string drivetrain = "tank";
-  std::string pistonState = "up";
+  std::string pistonState = "high";
 
   while (true) {
     motor_launch_lift.set_brake_mode(MOTOR_BRAKE_HOLD);
@@ -127,7 +127,7 @@ void opcontrol() {
 
     // updates groups 
     update_drivetrain_state(drivetrain);
-    update_flaps_state(pistonState);    
+    update_wings_state(pistonState);
 
     // single motors
 		launcher(update_launcher_input());

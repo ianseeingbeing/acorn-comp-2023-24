@@ -7,7 +7,7 @@
 /////
 
 
-const int DRIVE_SPEED = 127; // This is 110/127 (around 87% of max speed).  We don't suggest making this 127.
+const int DRIVE_SPEED = 110; // This is 110/127 (around 87% of max speed).  We don't suggest making this 127.
                              // If this is 127 and the robot tries to heading correct, it's only correcting by
                              // making one side slower.  When this is 87%, it's correcting by making one side
                              // faster and one side slower, giving better heading correction.
@@ -269,38 +269,61 @@ void turn(int deg) {
 }
 
 // bot is opposite where team stands
-void auton_far_side() {
-	// put held ball int goal
-	turn(65);
-	drive(1650);
-	turn(180);
-	drive(700);
-	intake("reverse");
-	drive(-400);
-	intake("off");
+void auton_far_side() { // next to goal
+  // grab ball
+  intake("on");
+  drive(250);
 
-	// get second ball and put in goal
-	turn(0);
-	intake("on");
-	drive(700);
-	drive(-300);
-	turn(180);
-	intake("off");
-	drive(850);
-	intake("reverse");
-	drive(-300);
-	intake("off");
+  // push ball into goal
+  drive(-1100);
+  turn(-35);
+  drive(-630);
+  turn(-80);
+  drive(-550);
+  drive(250);
+
+  // spin and push in intake
+  turn(90);
+  intake("off");
+  drive(450);
+  drive(-700);
+
+  // turn and move to solo center ball
+  turn(28);
+  intake("on");
+  drive(1500);
+  drive(-450);
+  turn(115);
+  intake("reverse");
+  pros::delay(500);
+
+  // grab center ball
+  intake("on");
+  turn(90);
+  drive(775);
+
+  // spin to goal and push in balls
+  turn(180);
+  intake("off");
+  drive(650);
+  drive(-300);
+
+  // get top middle ball
+  turn(0);
+  intake("on");
+  drive(800);
+  drive(-200);
+  turn(180);
+  intake("off");
+  drive(850);
+  drive(-300);
+
+
 }
 
 // bot is next to where team stands
 void auton_near_side() {
-	// knock in the touching ball into goal
-	turn(-30);
-	drive(-1050);
-	turn(0);
-	drive(350);
-	turn(-291);
-  
+
 }
 
 void auton_skills() {

@@ -270,53 +270,56 @@ void turn(int deg) {
 
 // bot is opposite where team stands
 void auton_far_side() { // next to goal
-  // grab ball
-  intake("on");
-  drive(250);
+    // grab ball
+    intake("on");
+    drive(250);
 
-  // push ball into goal
-  drive(-1100);
-  turn(-35);
-  drive(-630);
-  turn(-80);
-  drive(-550);
-  drive(250);
+    // push preload into goal
+    drive(-1100);
+    turn(-35);
+    drive(-630);
+    turn(-80);
+    drive(-550);
+    drive(250);
 
-  // spin and push in intake
-  turn(90);
-  intake("off");
-  drive(450);
-  drive(-700);
+    // spin and push intake ball
+    turn(90);
+    intake("off");
+    drive(450);
+    drive(-700);
 
-  // turn and move to solo center ball
-  turn(28);
-  intake("on");
-  drive(1500);
-  drive(-450);
-  turn(115);
-  intake("reverse");
-  pros::delay(500);
+    // turn and get top-right ball
+    turn(28);
+    intake("on");
+    drive(1500);
 
-  // grab center ball
-  intake("on");
-  turn(90);
-  drive(775);
+    drive(-600);
+    turn(90);
+    intake("off");
+    drive(475);
+    turn(180); // turn to score
+    drive(600);
+    drive(-700);
 
-  // spin to goal and push in balls
-  turn(180);
-  intake("off");
-  drive(650);
-  drive(-300);
+    // grab center ball
+    turn(90);
+    intake("on");
+    drive(450);
 
-  // get top middle ball
-  turn(0);
-  intake("on");
-  drive(800);
-  drive(-200);
-  turn(180);
-  intake("off");
-  drive(850);
-  drive(-300);
+    turn(180);
+    intake("off");
+    drive(650);
+    drive(-300);
+
+    // // get top middle ball
+    turn(0);
+    intake("on");
+    drive(800);
+    drive(-200);
+    turn(180);
+    intake("off");
+    drive(900);
+    drive(-300);
 
 
 }

@@ -11,8 +11,8 @@ const int DRIVE_SPEED = 110; // This is 110/127 (around 87% of max speed).  We d
                              // If this is 127 and the robot tries to heading correct, it's only correcting by
                              // making one side slower.  When this is 87%, it's correcting by making one side
                              // faster and one side slower, giving better heading correction.
-const int TURN_SPEED  = 90;
-const int SWING_SPEED = 90;
+const int TURN_SPEED  = 100;
+const int SWING_SPEED = 100;
 
 
 
@@ -53,11 +53,11 @@ void two_mogo_constants() {
   chassis.set_pid_constants(&chassis.swingPID, 7, 0, 45, 0);
 }
 
-
+// exit conditions
 void modified_exit_condition() {
-  chassis.set_exit_condition(chassis.turn_exit, 100, 3, 500, 7, 500, 500);
-  chassis.set_exit_condition(chassis.swing_exit, 100, 3, 500, 7, 500, 500);
-  chassis.set_exit_condition(chassis.drive_exit, 80, 50, 300, 150, 500, 500);
+  chassis.set_exit_condition(chassis.turn_exit, 5, 3, 25, 7, 25, 50);
+  chassis.set_exit_condition(chassis.swing_exit, 5, 3, 25, 7, 25, 50);
+  chassis.set_exit_condition(chassis.drive_exit, 4, 50, 15, 75, 25, 50);
 }
 
 
@@ -268,65 +268,56 @@ void turn(int deg) {
 	chassis.wait_drive();
 }
 
+void swing(std::string direction, int degree) {
+  if (direction == "left") {
+    chassis.set_swing_pid(ez::LEFT_SWING, degree, TURN_SPEED);
+  }
+  else if (direction == "right") {
+    chassis.set_swing_pid(ez::RIGHT_SWING, degree, TURN_SPEED);
+  }
+  chassis.wait_drive();
+}
+
 // bot is opposite where team stands
 void auton_far_side() { // next to goal
     // grab ball
     intake("on");
     drive(250);
 
-    // push preload into goal
+    // push colored-preload into goal
     drive(-1100);
     turn(-35);
+    // ** piston flaps maybe ** 
     drive(-630);
-    turn(-80);
+    turn(-82);
     drive(-550);
+
+    // spin and push held ball into goal
+    turn(90);
+    intake("reverse");
+    drive(310);
+    drive(-700);
+
+    // grab top-center ball
+    turn(48);
+    intake("on");
+    drive(1695);
+    swing("right", 0);
+
+    // push center and top-right ball into goal 
+    drive(-1050);
+
+    // push in loaded ball
+    turn(180);
+    intake("off");
     drive(250);
-
-    // spin and push intake ball
-    turn(90);
-    intake("off");
-    drive(450);
-    drive(-700);
-
-    // turn and get top-right ball
-    turn(28);
-    intake("on");
-    drive(1500);
-
-    drive(-600);
-    turn(90);
-    intake("off");
-    drive(475);
-    turn(180); // turn to score
-    drive(600);
-    drive(-700);
-
-    // grab center ball
-    turn(90);
-    intake("on");
-    drive(450);
-
-    turn(180);
-    intake("off");
-    drive(650);
     drive(-300);
-
-    // // get top middle ball
-    turn(0);
-    intake("on");
-    drive(800);
-    drive(-200);
-    turn(180);
-    intake("off");
-    drive(900);
-    drive(-300);
-
-
 }
 
 // bot is next to where team stands
 void auton_near_side() {
-
+    drive(200);
+    swing("right", 90);
 }
 
 void auton_skills() {

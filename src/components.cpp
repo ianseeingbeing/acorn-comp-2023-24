@@ -55,8 +55,7 @@ pros::Motor motor_launch_lift(6, pros::E_MOTOR_GEAR_GREEN, false, pros::E_MOTOR_
 pros::Motor motor_intake(4, pros::E_MOTOR_GEAR_GREEN, false, pros::E_MOTOR_ENCODER_DEGREES);
 
 // pistons
-pros::ADIDigitalOut piston_flap_a(1);
-pros::ADIDigitalOut piston_flap_b(2);
+pros::ADIDigitalOut piston_flaps(2);
 
 // potentiometer
 pros::ADIAnalogIn auton_switch(3);

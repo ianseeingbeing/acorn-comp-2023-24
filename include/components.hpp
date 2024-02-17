@@ -14,8 +14,7 @@ extern pros::Motor motor_launch_lift;
 extern pros::Motor motor_intake;
 
 // pistons
-extern pros::ADIDigitalOut piston_flap_a;
-extern pros::ADIDigitalOut piston_flap_b;
+extern pros::ADIDigitalOut piston_flaps;
 
 // potentiometer
 extern pros::ADIAnalogIn auton_switch;

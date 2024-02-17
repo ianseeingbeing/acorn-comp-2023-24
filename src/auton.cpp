@@ -316,8 +316,31 @@ void auton_far_side() { // next to goal
 
 // bot is next to where team stands
 void auton_near_side() {
-    drive(200);
-    swing("right", 90);
+    // push colored-preload into goal
+    turn(-30);
+	drive(-1075);
+	turn(0);
+	drive(350);
+
+    // collect bar ball
+	turn(-45);
+    drive(620);
+    turn(-90);
+    intake("on");
+    drive(1000);
+    drive(-100);
+    turn(90);
+    intake("reverse");
+
+    // touch bar
+    drive(-115);
+    intake("off");
+    pros::delay(3000);
+    launcher_lift("up");
+    while(true) {
+        motor_launch_lift.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+    }  
+
 }
 
 void auton_skills() {

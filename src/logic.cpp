@@ -27,12 +27,10 @@ void update_wings_state(std::string &state) {
 		pros::delay(400);
 		if ("high" == state) {
 			state = "low";
-			left_wing(state);
-			right_wing(state);
+			piston_flaps.set_value(LOW);
 		} else {
 			state = "high";
-			left_wing(state);
-			left_wing(state);
+			piston_flaps.set_value(HIGH);
 		}
 		pros::delay(100); 
 	}
@@ -105,22 +103,4 @@ void intake(std::string state) {
 		motor_intake = 0;
 	}
 	pros::delay(10);
-}
-
-void left_wing(std::string state) {
-    if (state == "high") {
-        piston_flap_a.set_value(HIGH);
-    }
-    else if (state == "low") {
-        piston_flap_a.set_value(LOW);
-    }
-}
-
-void right_wing(std::string state) {
-    if (state == "high") {
-        piston_flap_b.set_value(HIGH);
-    }
-    else if (state == "low") {
-        piston_flap_b.set_value(LOW);
-    }
 }

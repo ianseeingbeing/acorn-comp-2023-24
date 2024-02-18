@@ -104,3 +104,12 @@ void intake(std::string state) {
 	}
 	pros::delay(10);
 }
+
+void wings(std::string state) {
+	if (state == "high") {
+		piston_flaps.set_value(HIGH);
+	}
+	else {
+		piston_flaps.set_value(LOW);
+	}
+}

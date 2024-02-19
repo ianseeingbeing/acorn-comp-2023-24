@@ -7,7 +7,7 @@
 /////
 
 
-const int DRIVE_SPEED = 110; // This is 110/127 (around 87% of max speed).  We don't suggest making this 127.
+const int DRIVE_SPEED = 120; // This is 110/127 (around 87% of max speed).  We don't suggest making this 127.
 														 // If this is 127 and the robot tries to heading correct, it's only correcting by
 														 // making one side slower.  When this is 87%, it's correcting by making one side
 														 // faster and one side slower, giving better heading correction.
@@ -246,10 +246,10 @@ void interfered_example() {
 // . . .
 
 void auton() {
-	if (auton_switch.get_value_calibrated() < 30) { 
+	if (auton_switch.get_value_calibrated() < 50) { 
 		auton_near_side(); // tiwst tward back
 	}
-	else if (auton_switch.get_value_calibrated() > 4065) {
+	else if (auton_switch.get_value_calibrated() > 4045) {
 		auton_far_side(); // twist tward intake
 	}
 	else {
@@ -284,34 +284,33 @@ void auton_far_side() { // next to goal
     intake("on");
     drive(280);
 
-    // push colored-preload into goal
+    // push colored-preload and intake into goal
     drive(-1100);
-    turn(-35);
-    // ** piston flaps maybe ** 
-    drive(-630);
-    turn(-82);
-    drive(-550);
+    turn(135);
+    drive(650);
+	wings("high");
+    turn(95);
+	intake("off");
+    drive(560);
+    drive(-680);
+	wings("low");
 
-    // spin and push held ball into goal
-    turn(90);
-    intake("reverse");
-    drive(310);
-    drive(-700);
+	// grap and release solo right ball
+
 
     // grab top-center ball
-    turn(48);
+    turn(45);
     intake("on");
     drive(1695);
     swing("right", 0);
+	turn(180);
+	wings("high");
 
     // push center and top-right ball into goal 
-    drive(-1050);
-
-    // push in loaded ball
-    turn(180);
     intake("off");
-    drive(250);
-    drive(-300);
+    drive(1000);
+	wings("low");
+    drive(-400);
 }
 
 // bot is next to where team stands
@@ -388,13 +387,13 @@ void auton_skills() {
     drive(-600);
 
     // get stuff on the side
-    turn(0);
-    wings("high");
-    drive(1000);
-    turn(-45);
-    drive(800);
-    swing("right", -180);
-    drive(700);
+    // turn(0);
+    // wings("high");
+    // drive(1000);
+    // turn(-45);
+    // drive(800);
+    // swing("right", -180);
+    // drive(700);
 
 }
 
